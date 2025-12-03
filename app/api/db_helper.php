@@ -259,17 +259,64 @@ function fetchAndRender($query, $params = [], $format = 'array', $actions = []) 
  * @param array $params
  * @return array [success=>bool, message=>string, data=>mixed|null]
  */
-
-function executeQuery($query, $params = []) {
+function executeQuery($query, $data_type="ASSOC", $params = []) {
     $pdo = getDB();
     $response = ['success' => false, 'message' => '', 'data' => null];
 
     try {
         $stmt = $pdo->prepare($query);
         $stmt->execute($params);
-
+        $data_type = strtoupper($data_type);
         if (preg_match('/^select|show|desc|describe|explain/i', $query)) {
-            $response['data'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            switch ($data_type) {
+                case 'ASSOC':
+                    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    break;
+                case 'NUM':
+                    $data = $stmt->fetchAll(PDO::FETCH_NUM);
+                    break;
+                case 'BOTH':
+                    $data = $stmt->fetchAll(PDO::FETCH_BOTH);
+                    break;
+                case 'OBJ':
+                    $data = $stmt->fetchAll(PDO::FETCH_OBJ);
+                    break;
+                // case 'LAZY':
+                //     $data = $stmt->fetchAll(PDO::FETCH_LAZY);
+                //     break;
+                case 'BOUND':
+                    $data = $stmt->fetchAll(PDO::FETCH_BOUND);
+                    break;
+                case 'CLASS':
+                    $data = $stmt->fetchAll(PDO::FETCH_CLASS);
+                    break;
+                case 'INTO':
+                    $data = $stmt->fetchAll(PDO::FETCH_INTO);
+                    break;
+                // case 'FUNC':
+                //     $data = $stmt->fetchAll(PDO::FETCH_FUNC);
+                //     break;
+                case 'GROUP':
+                    $data = $stmt->fetchAll(PDO::FETCH_GROUP);
+                    break;
+                case 'UNIQUE':
+                    $data = $stmt->fetchAll(PDO::FETCH_UNIQUE);
+                    break;
+                case 'KEY_PAIR':
+                    $data = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+                    break;
+                case 'COLUMN':
+                    $data = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                    break;
+                case 'NAMED':
+                    $data = $stmt->fetchAll(PDO::FETCH_NAMED);
+                    break;
+                
+                default:
+                    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    break;
+            }
+            $response['data'] = $data;
         } else {
             $response['success'] = true;
             $response['message'] = 'Query executed successfully.';

@@ -4,6 +4,7 @@ header('Content-Type: application/json');
 session_start();
 
 require_once '../system/cogs/db.php'; // Adjust path as needed
+require_once '../../sendmail.php'; // Adjust path as needed
 
 function jsonResponse($success, $message, $redirect = null) {
     echo json_encode([
@@ -14,7 +15,8 @@ function jsonResponse($success, $message, $redirect = null) {
     exit;
 }
 
-$action = $_POST['action'] ?? '';
+$action = $_GET['action'] ?? $_POST['action'] ?? '';
+
 if ($action === 'login') {
     $username = trim($_POST['username'] ?? '');
     $password = trim($_POST['password'] ?? '');
@@ -23,17 +25,16 @@ if ($action === 'login') {
         jsonResponse(false, 'Username and password are required.');
     }
 
-    // Example: Replace with your actual user query
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? or email = ?");
-    $stmt->execute([$username,$username]);
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? OR email = ?");
+    $stmt->execute([$username, $username]);
     $user = $stmt->fetch();
-    if ($user && password_verify($password, $user['password'])) {
 
+    if ($user && password_verify($password, $user['password'])) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user'] = [$user['username'], $user['email'], $user['status'], $user['created_at'], $user['updated_at']];
         $_SESSION['token'] = bin2hex(random_bytes(16));
         $_SESSION['project_id'] = '965766';
-        jsonResponse(true, 'Login successful.', '../../');
+        jsonResponse(true, 'Login successful.', '@home');
     } else {
         jsonResponse(false, 'Invalid username or password.');
     }
@@ -48,7 +49,6 @@ if ($action === 'register') {
         jsonResponse(false, 'All fields are required.');
     }
 
-    // Check if username or email exists
     $stmt = $pdo->prepare("SELECT id FROM users WHERE username = ? OR email = ?");
     $stmt->execute([$username, $email]);
     if ($stmt->fetch()) {
@@ -60,27 +60,10 @@ if ($action === 'register') {
     if ($stmt->execute([$username, $email, $hashedPassword])) {
         $id = $pdo->lastInsertId();
         $add = $pdo->prepare("INSERT INTO `user_profile`(`user_id`, `first_name`, `last_name`, `username`, `email`, `phone`, `avatar_url`, `bio`, `gender`, `date_of_birth`, `country`, `city`, `state`, `zip_code`, `social_links`, `created_at`, `updated_at`) VALUES 
-            (   ?,
-                ?,
-                '',
-                ?,
-                ?,
-                '',
-                '',
-                '',
-                '',
-                '',
-                '',
-                '',
-                '',
-                '',
-                NULL,
-                CURRENT_TIMESTAMP,
-                NULL
-            )");
-        $add->execute([$id,$username,$username,$email]);
+            (?, ?, '', ?, ?, '', '', '', '', '', '', '', '', '', NULL, CURRENT_TIMESTAMP, NULL)");
+        $add->execute([$id, $username, $username, $email]);
 
-        jsonResponse(true, 'Registration successful.', '../../');
+        jsonResponse(true, 'Registration successful.', '@home');
     } else {
         jsonResponse(false, 'Registration failed.');
     }
@@ -92,19 +75,20 @@ if ($action === 'forgot') {
         jsonResponse(false, 'Email is required.');
     }
 
-    // Example: Check if email exists
     $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch();
 
     if ($user) {
-        // Generate a reset token and save it (implement your own logic)
         $token = bin2hex(random_bytes(32));
-        $stmt = $pdo->prepare("UPDATE users SET reset_token = ?, reset_token_expiry = DATE_ADD(NOW(), INTERVAL 1 HOUR) WHERE id = ?");
+        $stmt = $pdo->prepare("UPDATE users SET verification_code = ?, verification_code_expires = DATE_ADD(NOW(), INTERVAL 1 HOUR) WHERE id = ?");
         $stmt->execute([$token, $user['id']]);
 
-        // Send email (implement your own mail logic)
-        // mail($email, "Password Reset", "Reset link: https://yourdomain.com/reset.php?token=$token");
+        sendingEmail([
+            'email' => $email,
+            'subject' => "Password Reset",
+            'message' => "Reset link: http://localhost/amamazahub/@reset?token=$token"
+        ]);
 
         jsonResponse(true, 'Reset link sent to your email.');
     } else {
@@ -112,4 +96,57 @@ if ($action === 'forgot') {
     }
 }
 
+/* -------------------------------
+   NEW API: verify_token
+--------------------------------- */
+if ($action === 'verify_token') {
+    $token = trim($_GET['token'] ?? $_POST['token'] ?? '');
+    if ($token === '') {
+        jsonResponse(false, 'Token is required.');
+    }
+
+    $stmt = $pdo->prepare("SELECT id FROM users WHERE verification_code = ? AND verification_code_expires > NOW()");
+    $stmt->execute([$token]);
+    $user = $stmt->fetch();
+
+    if ($user) {
+        jsonResponse(true, 'Token is valid.');
+    } else {
+        jsonResponse(false, 'Invalid or expired token.');
+    }
+}
+
+/* -------------------------------
+   NEW API: reset_password
+--------------------------------- */
+if ($action === 'reset_password') {
+    $token = trim($_POST['token'] ?? '');
+    $password1 = trim($_POST['password1'] ?? '');
+    $password2 = trim($_POST['password2'] ?? '');
+
+    if ($token === '' || $password1 === '' || $password2 === '') {
+        jsonResponse(false, 'All fields are required.');
+    }
+
+    if ($password1 !== $password2) {
+        jsonResponse(false, 'Passwords do not match.');
+    }
+
+    // Check if token is valid
+    $stmt = $pdo->prepare("SELECT id FROM users WHERE verification_code = ? AND verification_code_expires > NOW()");
+    $stmt->execute([$token]);
+    $user = $stmt->fetch();
+
+    if (!$user) {
+        jsonResponse(false, 'Invalid or expired token.');
+    }
+
+    $hashedPassword = password_hash($password1, PASSWORD_DEFAULT);
+    $stmt = $pdo->prepare("UPDATE users SET password = ?, verification_code = NULL, verification_code_expires = NULL WHERE id = ?");
+    $stmt->execute([$hashedPassword, $user['id']]);
+
+    jsonResponse(true, 'Password has been reset successfully.', '@login');
+}
+
 jsonResponse(false, 'Invalid action.');
+?>

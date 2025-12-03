@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register . PDT0</title>
+    <title>Register . amamazahub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
     <div class="w-full max-w-sm bg-white rounded-lg shadow-md p-8">
-        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">PDT0 Register</h2>
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">amamazahub Register</h2>
         <form id="signupForm" class="space-y-5">
             <div>
                 <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
@@ -48,7 +48,7 @@
             <div id="signupError" class="text-red-500 text-sm text-center hidden"></div>
         </form>
         <div class="mt-6 flex flex-col items-center space-y-2">
-            <a href="./login.php" class="text-blue-600 hover:underline text-sm">Already have an account? Login</a>
+            <a href="@login" class="text-blue-600 hover:underline text-sm">Already have an account? Login</a>
         </div>
     </div>
     <script>
@@ -97,13 +97,13 @@
             if (!valid) return;
 
             $.ajax({
-                url: './action.php', // Change to your actual register handler
-                type: 'POST',
+                url: 'auth/action',
                 data: { username, email, password, action:'register' },
+                method: "POST",
                 dataType: 'json',
                 success: function (response) {
                     if (response.success) {
-                        window.location.href = response.redirect || './login.php';
+                        window.location.href = response.redirect || '@login';
                     } else {
                         $('#signupError').text(response.message || 'Registration failed.').removeClass('hidden');
                     }

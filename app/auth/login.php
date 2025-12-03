@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login . PDT0</title>
+    <title>Login . amamazahub</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- jQuery CDN -->
@@ -11,7 +11,7 @@
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
     <div class="w-full max-w-sm bg-white rounded-lg shadow-md p-8">
-        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Login to PDT0</h2>
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Login to amamazahub</h2>
         <form id="loginForm" class="space-y-5">
             <div>
                 <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
@@ -44,8 +44,8 @@
             <div id="loginError" class="text-red-500 text-sm text-center hidden"></div>
         </form>
         <div class="mt-6 flex flex-col items-center space-y-2">
-            <a href="./signup.html" class="text-blue-600 hover:underline text-sm">Register</a>
-            <a href="./forgot-password.html" class="text-blue-600 hover:underline text-sm">Forgot Password?</a>
+            <a href="@signup" class="text-blue-600 hover:underline text-sm">Register</a>
+            <a href="@forgot-password" class="text-blue-600 hover:underline text-sm">Forgot Password?</a>
         </div>
     </div>
     <script>
@@ -86,7 +86,7 @@
             if (!valid) return;
 
             $.ajax({
-                url: './action.php',
+                url: 'auth/action',
                 type: 'POST',
                 data: { username, password, action:'login' },
                 dataType: 'json',

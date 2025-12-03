@@ -1,9 +1,9 @@
 const CACHE_NAME = "dashboard-cache-v1";
 const urlsToCache = [
-  "/PDT0/",
-  "/PDT0/manifest.json",
-  "/PDT0/app/systems/filemanager/favicons/favicon-32x32.png",
-  "/PDT0/app/systems/filemanager/favicons/favicon-16x16.png",
+  "/amamazahub/",
+  "/amamazahub/manifest.json",
+  "/amamazahub/app/systems/filemanager/favicons/favicon-32x32.png",
+  "/amamazahub/app/systems/filemanager/favicons/favicon-16x16.png",
   "https://cdn.tailwindcss.com",
   "https://unpkg.com/lucide@latest"
 ];

@@ -209,14 +209,14 @@ html {
   <meta name="mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="apple-mobile-web-app-title" content="PDT0"/>
-  <link rel="manifest" href="/pdt0/manifest.json"/>
+  <meta name="apple-mobile-web-app-title" content="amamazahub"/>
+  <link rel="manifest" href="/amamazahub/manifest.json"/>
 
   <!-- Favicons -->
-  <link rel="icon" type="image/png" sizes="32x32" href="/pdt0/app/system/filemanager/favicons/favicon-32x32.png"/>
-  <link rel="icon" type="image/png" sizes="16x16" href="/pdt0/app/system/filemanager/favicons/favicon-16x16.png"/>
-  <link rel="apple-touch-icon" sizes="180x180" href="/pdt0/app/system/filemanager/favicons/apple-touch-icon.png"/>
-  <link rel="mask-icon" href="/pdt0/app/system/filemanager/favicons/safari-pinned-tab.svg" color="#e60023"/>
+  <link rel="icon" type="image/png" sizes="32x32" href="/amamazahub/app/system/filemanager/favicons/favicon-32x32.png"/>
+  <link rel="icon" type="image/png" sizes="16x16" href="/amamazahub/app/system/filemanager/favicons/favicon-16x16.png"/>
+  <link rel="apple-touch-icon" sizes="180x180" href="/amamazahub/app/system/filemanager/favicons/apple-touch-icon.png"/>
+  <link rel="mask-icon" href="/amamazahub/app/system/filemanager/favicons/safari-pinned-tab.svg" color="#e60023"/>
   <meta name="msapplication-TileColor" content="#ffffff"/>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
@@ -227,7 +227,7 @@ html {
 
       <button class="hover:bg-gray-100 p-2 rounded-full px-3 hover:text-red-500" onclick="toggleIcons()"><i class="dripicons-menu"></i></button>
     <!-- Logo -->
-    <a href = '/pdt0/' class="flex items-center space-x-2">
+    <a href = '/amamazahub/' class="flex items-center space-x-2">
       <span class="text-xl font-bold text-gray-800 dark:text-white">403</span>
     </a>
     </div>
@@ -304,7 +304,7 @@ html {
     }
 
     // Fetch top 5 results from backend
-    const res = await fetch(`/pdt0/search_suggestions?q=${encodeURIComponent(query)}`);
+    const res = await fetch(`/amamazahub/search_suggestions?q=${encodeURIComponent(query)}`);
     const results = await res.json();
 
     resultsList.innerHTML = results
@@ -377,7 +377,7 @@ html {
     <!-- Right: icons -->
     <div class="flex items-center space-x-3">
       <!-- Create icon -->
-      <a href="/pdt0/s/Create" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+      <a href="/amamazahub/s/Create" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
         <svg class="w-6 h-6 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
         </svg>
@@ -400,9 +400,9 @@ html {
         </button>
         <div id="notifDropdown" class="dropdown-content absolute right-0 top-full mt-1 w-60 bg-white dark:bg-gray-800 shadow-3xl border dark:border-gray-700 rounded-lg">
           <div>
-            <a href="/pdt0/n/notification1" class="px-4 block py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer rounded-t-lg rounded-b-none">Notification Notification 1</a>
-            <a href="/pdt0/n/notification1" class="px-4 block py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">Notification Notification 2</a>
-            <a href="/pdt0/n/notification1" class="px-4 block py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer rounded-t-none rounded-b-lg">Notification Notification 3</a>
+            <a href="/amamazahub/n/notification1" class="px-4 block py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer rounded-t-lg rounded-b-none">Notification Notification 1</a>
+            <a href="/amamazahub/n/notification1" class="px-4 block py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">Notification Notification 2</a>
+            <a href="/amamazahub/n/notification1" class="px-4 block py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer rounded-t-none rounded-b-lg">Notification Notification 3</a>
           </div>
         </div>
       </div>
@@ -414,20 +414,20 @@ html {
         </button>
         <div id="profileDropdown" class="dropdown-content absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 shadow-lg dark:border-gray-700 border rounded-lg">
           <div>
-            <a href="/pdt0/s/profile" class="px-4 py-2 block hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer rounded-t-lg rounded-b-none">
+            <a href="/amamazahub/s/profile" class="px-4 py-2 block hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer rounded-t-lg rounded-b-none">
             <i class="mdi mdi-account me-3"></i> Profile</a>
-            <a href="/pdt0/s/settings" class="px-4 py-2 block hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+            <a href="/amamazahub/s/settings" class="px-4 py-2 block hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
             <i class="mdi mdi-cogs me-3"></i> Settings</a>
-            <a href="/pdt0/s/explore" class="px-4 py-2 block hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+            <a href="/amamazahub/s/explore" class="px-4 py-2 block hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
             <i class="mdi mdi-robot me-3"></i> Explore</a>
             <div class="border-t border-gray-200 dark:border-gray-700"></div>
-            <a href="/pdt0/s/report" class="px-4 py-2 block hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+            <a href="/amamazahub/s/report" class="px-4 py-2 block hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
             <i class="mdi mdi-history me-3"></i> Report history</a>
-            <a href="/pdt0/s/help" class="px-4 py-2 block hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer
+            <a href="/amamazahub/s/help" class="px-4 py-2 block hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer
               "><i class="mdi mdi-help me-3"></i> Help</a>
-            <a href="/pdt0/s/feedback" class="px-4 py-2 block hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+            <a href="/amamazahub/s/feedback" class="px-4 py-2 block hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
             <i class="mdi mdi-message me-3"></i> Send feedback</a>
-            <a href="/pdt0/logout/" class="px-4 py-2 block hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer rounded-t-none rounded-b-lg">
+            <a href="/amamazahub/logout/" class="px-4 py-2 block hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer rounded-t-none rounded-b-lg">
             <i class="mdi mdi-logout me-3"></i> Logout</a>
           </div>
         </div>
@@ -452,7 +452,7 @@ html {
       <li class="mt-4"><span class="text-gray-500 dark:text-gray-400 uppercase text-xs">Extra</span></li>
 
       <li>
-        <a title="Dashboard" href="/pdt0/s/Dashboard" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+        <a title="Dashboard" href="/amamazahub/s/Dashboard" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
           <i title="Dashboard" data-lucide="home" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
 
           <span data-txt class="">Dashboard</span>
@@ -461,7 +461,7 @@ html {
       </li>
 
       <li>
-        <a title="Search" href="/pdt0/s/Search" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+        <a title="Search" href="/amamazahub/s/Search" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
           <i title="Search" data-lucide="search" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
 
           <span data-txt class="">Search</span>
@@ -469,7 +469,7 @@ html {
       </li>
 
       <li>
-        <a title="Create" href="/pdt0/s/Create" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+        <a title="Create" href="/amamazahub/s/Create" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
           <i title="Create" data-lucide="plus-square" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
 
           <span data-txt class="">Create</span>
@@ -477,7 +477,7 @@ html {
       </li>
 
       <li>
-        <a title="Content" href="/pdt0/s/Content" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+        <a title="Content" href="/amamazahub/s/Content" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
           <i title="Content" data-lucide="file-text" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
 
           <span data-txt class="">Content</span>
@@ -485,7 +485,7 @@ html {
       </li>
 
       <li>
-        <a title="Analytics" href="/pdt0/s/Analytics" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+        <a title="Analytics" href="/amamazahub/s/Analytics" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
           <i title="Analytics" data-lucide="bar-chart-2" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
 
           <span data-txt class="">Analytics</span>
@@ -495,7 +495,7 @@ html {
       <li><span class="text-gray-500 dark:text-gray-400 uppercase text-xs">You</span></li>
 
       <li>
-        <a title="History" href="/pdt0/s/History" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+        <a title="History" href="/amamazahub/s/History" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
           <i title="History" data-lucide="list" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
 
           <span data-txt class="">History</span>
@@ -506,7 +506,7 @@ html {
       <li class="mt-4"><span class="text-gray-500 dark:text-gray-400 uppercase text-xs">Your</span></li>
 
       <li>
-        <a title="Profile" href="/pdt0/s/Profile" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+        <a title="Profile" href="/amamazahub/s/Profile" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
           <i title="Profile" data-lucide="user" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
 
           <span data-txt class="">Profile</span>
@@ -514,7 +514,7 @@ html {
       </li>
 
       <li>
-        <a title="Settings" href="/pdt0/s/Settings" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+        <a title="Settings" href="/amamazahub/s/Settings" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
           <i title="Settings" data-lucide="settings" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
 
           <span data-txt class="">Settings</span>
@@ -522,7 +522,7 @@ html {
       </li>
 
       <li>
-        <a title="Explore" href="/pdt0/s/Explore" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+        <a title="Explore" href="/amamazahub/s/Explore" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
           <i title="Explore" data-lucide="compass" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
 
           <span data-txt class="">Explore</span>
@@ -533,7 +533,7 @@ html {
       <li class="mt-4"><span class="text-gray-500 dark:text-gray-400 uppercase text-xs">Settings</span></li>
 
       <li>
-        <a title="Report" href="/pdt0/s/Report" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+        <a title="Report" href="/amamazahub/s/Report" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
           <i title="Report" data-lucide="flag" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
 
           <span data-txt class="">Report</span>
@@ -541,7 +541,7 @@ html {
       </li>
 
       <li>
-        <a title="Help" href="/pdt0/s/Help" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+        <a title="Help" href="/amamazahub/s/Help" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
           <i title="Help" data-lucide="help-circle" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
 
           <span data-txt class="">Help</span>
@@ -549,7 +549,7 @@ html {
       </li>
 
       <li>
-        <a title="Send" href="/pdt0/s/feedback" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+        <a title="Send" href="/amamazahub/s/feedback" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
           <i title="Send feedback" data-lucide="message-square" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300"></i>
 
           <span data-txt class="">Send feedback</span>
@@ -557,7 +557,7 @@ html {
       </li>
 
       <li>
-        <a title="Sql runner" href="/pdt0/s/query" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+        <a title="Sql runner" href="/amamazahub/s/query" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
           <i title="Sql runner" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300 fa fa-code"></i>
 
           <span data-txt class="">SQL runner</span>
@@ -565,14 +565,14 @@ html {
       </li>
 
       <li>
-        <a title="File Manager" href="/pdt0/s/filemanager" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+        <a title="File Manager" href="/amamazahub/s/filemanager" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
           <i title="File Manager" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300 fa fa-folder"></i>
 
           <span data-txt class="">File Manager</span>
         </a>
       </li>
       <li>
-        <a title="cmd" href="/pdt0/s/cmd" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+        <a title="cmd" href="/amamazahub/s/cmd" class="flex items-center px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
           <i title="cmd" class="w-5 h-5 mr-3 text-gray-600 dark:text-gray-300 fa fa-terminal"></i>
 
           <span data-txt class="">CMD</span>
@@ -606,7 +606,7 @@ html {
             <h1 class="mb-4 text-7xl tracking-tight font-extrabold lg:text-9xl text-red-600 dark:text-primary-500">403</h1>
             <p class="mb-4 text-3xl tracking-tight font-bold text-gray-900 md:text-4xl dark:text-white">Forbidden.</p>
             <p class="mb-4 text-lg font-light text-gray-500 dark:text-gray-400">You don't have permission to access this resource. </p>
-            <a href="/pdt0/" class="inline-flex text-white bg-primary-600 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-primary-900 my-4">Back to Homepage</a>
+            <a href="/amamazahub/" class="inline-flex text-white bg-primary-600 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-primary-900 my-4">Back to Homepage</a>
         </div>   
     </div>
 </section>
@@ -792,7 +792,7 @@ darkModeToggle.addEventListener('click', () => {
   <?php  include 'app/api/ajax.php'; ?>
 <script>
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/pdt0/service-worker.js")
+    navigator.serviceWorker.register("/amamazahub/service-worker.js")
       .then(() => console.log("Service Worker registered"))
       .catch(err => console.error("SW failed:", err));
   }

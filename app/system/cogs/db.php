@@ -1,6 +1,6 @@
 <?php
 $host = 'localhost';
-$db   = '1000hills';
+$db   = 'amamazahub';
 $user = 'root';
 $pass = '';
 $charset = 'utf8mb4';

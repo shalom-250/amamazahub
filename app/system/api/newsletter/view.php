@@ -17,6 +17,6 @@
           data-id="<?= $row['id']; ?>">Delete</button>
       </div>
     </div>
-    <?php endwhile; ?>
+  
     <?php } ?>
     <?php loadCards($pdo) ?>
