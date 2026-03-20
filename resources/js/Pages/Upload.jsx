@@ -1,40 +1,124 @@
-import React from 'react';
+import React, { useState } from 'react';
 import AppLayout from '../Components/AppLayout';
-import { Head } from '@inertiajs/react';
-import { Upload as UploadIcon, Video, Music } from 'lucide-react';
+import { Head, useForm } from '@inertiajs/react';
+import { Upload as UploadIcon, Video, Music, CheckCircle2, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Upload() {
+    const { data, setData, post, processing, errors, reset } = useForm({
+        video: null,
+        caption: '',
+    });
+
+    const [preview, setPreview] = useState(null);
+    const [success, setSuccess] = useState(false);
+
+    const handleVideoChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setData('video', file);
+            setPreview(URL.createObjectURL(file));
+        }
+    };
+
+    const submit = (e) => {
+        e.preventDefault();
+        post('/videos', {
+            onSuccess: () => {
+                setSuccess(true);
+                reset();
+                setPreview(null);
+                setTimeout(() => setSuccess(false), 3000);
+            },
+        });
+    };
+
     return (
         <AppLayout>
-            <Head title="Upload" />
-            <div className="p-6 max-w-5xl mx-auto h-full flex items-center justify-center pb-24 md:pb-6">
-                <div className="bg-gray-900 border-2 border-dashed border-gray-700 rounded-2xl p-10 flex flex-col items-center text-center space-y-6 w-full max-w-2xl cursor-pointer hover:bg-gray-800/50 transition duration-300 group">
-                    <div className="bg-gray-800 rounded-full p-6 group-hover:bg-primary/20 transition duration-300">
-                        <UploadIcon className="w-12 h-12 text-gray-400 group-hover:text-primary" />
-                    </div>
-                    <div>
-                        <h2 className="text-xl font-bold">Select video to upload</h2>
-                        <p className="text-gray-500 mt-2">Or drag and drop a file</p>
-                    </div>
+            <Head title="Upload Video" />
+            <div className="p-6 max-w-5xl mx-auto h-full flex flex-col items-center justify-center pb-24 md:pb-6">
+                <AnimatePresence>
+                    {success && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0 }}
+                            className="bg-green-500 text-black font-bold px-6 py-3 rounded-full mb-8 flex items-center space-x-2 shadow-lg"
+                        >
+                            <CheckCircle2 size={20} />
+                            <span>Video uploaded successfully!</span>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
-                    <div className="grid grid-cols-2 gap-4 w-full pt-6 text-sm text-gray-400 font-semibold">
-                        <div className="flex items-center space-x-2 justify-center bg-gray-800/40 p-3 rounded-lg">
-                            <Video size={16} />
-                            <span>MP4 or WebM</span>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 w-full max-w-4xl bg-gray-900/40 p-10 rounded-3xl border border-white/10 backdrop-blur-sm">
+                    {/* Left: Upload Area */}
+                    <div className="lg:col-span-1">
+                        <div className="relative aspect-[9/16] bg-black border-2 border-dashed border-gray-700 rounded-2xl overflow-hidden group hover:border-primary transition">
+                            {preview ? (
+                                <video src={preview} className="w-full h-full object-cover" controls />
+                            ) : (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4 space-y-4">
+                                    <div className="bg-gray-800 rounded-full p-4 group-hover:bg-primary/20 transition">
+                                        <UploadIcon className="w-10 h-10 text-gray-500 group-hover:text-primary transition" />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <p className="font-bold">Select video</p>
+                                        <p className="text-xs text-gray-500">MP4 or WebM only</p>
+                                    </div>
+                                    <button className="bg-primary text-black text-xs font-black px-4 py-2 rounded-md">
+                                        Select file
+                                    </button>
+                                </div>
+                            )}
+                            <input
+                                type="file"
+                                className="absolute inset-0 opacity-0 cursor-pointer"
+                                onChange={handleVideoChange}
+                                accept="video/*"
+                            />
                         </div>
-                        <div className="flex items-center space-x-2 justify-center bg-gray-800/40 p-3 rounded-lg">
-                            <Music size={16} />
-                            <span>720x1280 or higher</span>
-                        </div>
                     </div>
 
-                    <button className="bg-primary text-black font-black px-12 py-3 rounded-md shadow-lg shadow-primary/20 hover:bg-primary/90 transition transform hover:scale-105">
-                        Select file
-                    </button>
+                    {/* Right: Form Info */}
+                    <div className="lg:col-span-2 space-y-8">
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-gray-400 uppercase tracking-widest pl-1">Caption</label>
+                            <textarea
+                                value={data.caption}
+                                onChange={e => setData('caption', e.target.value)}
+                                className="w-full bg-black/40 border border-white/10 rounded-xl py-4 px-4 focus:ring-2 focus:ring-primary outline-none transition min-h-[100px] resize-none"
+                                placeholder="Add a catchy caption..."
+                            />
+                            <p className="text-right text-[10px] text-gray-500 font-bold uppercase">{data.caption.length} / 255</p>
+                        </div>
 
-                    <p className="text-[12px] text-gray-500 max-w-md">
-                        By submitting your videos to AmazamaHub, you acknowledge that you agree to our Terms of Service and Community Guidelines.
-                    </p>
+                        <div className="space-y-4">
+                            <div className="flex items-center space-x-3 text-sm text-gray-400 font-medium">
+                                <Video size={18} />
+                                <span>Vertical (9:16) format recommended</span>
+                            </div>
+                            <div className="flex items-center space-x-3 text-sm text-gray-400 font-medium">
+                                <Music size={18} />
+                                <span>Original sound will be used</span>
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={submit}
+                            disabled={processing || !data.video}
+                            className="w-full bg-primary text-black font-black py-4 rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition disabled:opacity-50 flex items-center justify-center space-x-2"
+                        >
+                            {processing ? (
+                                <>
+                                    <Loader2 className="animate-spin" size={20} />
+                                    <span>Post video...</span>
+                                </>
+                            ) : (
+                                <span>Post video</span>
+                            )}
+                        </button>
+                    </div>
                 </div>
             </div>
         </AppLayout>

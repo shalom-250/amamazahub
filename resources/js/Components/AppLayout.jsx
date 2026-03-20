@@ -1,8 +1,12 @@
+import React from 'react';
+import Navbar from './Navbar';
+import Sidebar from './Sidebar';
 import { Link, usePage } from '@inertiajs/react';
+import { Home, Compass, Plus, MessageSquare, User, Search } from 'lucide-react';
 
 export default function AppLayout({ children }) {
-    const { auth } = usePage().props;
-    const user = auth.user;
+    const { props } = usePage();
+    const user = props.auth?.user;
 
     return (
         <div className="bg-black text-white h-screen flex flex-col overflow-hidden">

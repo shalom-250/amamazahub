@@ -1,18 +1,21 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
-import { Home, Compass, Upload, MessageSquare, User, LogIn } from 'lucide-react';
+import { Home, Compass, Upload, MessageSquare, User, LogIn, Users } from 'lucide-react';
 import { usePage } from '@inertiajs/react';
 
-export default function Sidebar() {
+export default function Sidebar({ user }) {
     const { url } = usePage();
 
     const menus = [
         { name: 'Home', icon: <Home size={28} />, href: '/' },
         { name: 'Explore', icon: <Compass size={28} />, href: '/explore' },
         { name: 'Upload', icon: <Upload size={28} />, href: '/upload' },
-        { name: 'Messages', icon: <MessageSquare size={28} />, href: '/messages' },
-        { name: 'Profile', icon: <User size={28} />, href: '/profile' },
+        { name: 'Following', icon: <Users size={28} />, href: '/following' },
     ];
+
+    if (user) {
+        menus.push({ name: 'Profile', icon: <User size={28} />, href: '/profile' });
+    }
 
     const isActive = (href) => {
         if (href === '/' && url === '/') return true;
@@ -40,13 +43,15 @@ export default function Sidebar() {
                 ))}
             </div>
 
-            <div className="border-t border-gray-800 my-4 pt-4 px-2 hidden lg:block">
-                <p className="text-gray-500 text-sm font-medium">Log in to follow creators, like videos, and view comments.</p>
-                <Link href="/login" className="mt-4 w-full border border-primary text-primary font-bold py-3 rounded-md hover:bg-primary/10 transition flex items-center justify-center space-x-2">
-                    <LogIn size={20} />
-                    <span>Log in</span>
-                </Link>
-            </div>
+            {!user && (
+                <div className="border-t border-gray-800 my-4 pt-4 px-2 hidden lg:block">
+                    <p className="text-gray-500 text-sm font-medium">Log in to follow creators, like videos, and view comments.</p>
+                    <Link href="/login" className="mt-4 w-full border border-primary text-primary font-bold py-3 rounded-md hover:bg-primary/10 transition flex items-center justify-center space-x-2">
+                        <LogIn size={20} />
+                        <span>Log in</span>
+                    </Link>
+                </div>
+            )}
 
             <div className="space-y-4 text-xs text-gray-500 font-semibold px-2 py-4 hidden lg:block">
                 <div className="flex flex-wrap gap-2">

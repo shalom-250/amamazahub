@@ -33,7 +33,10 @@ Route::get('/profile', function () {
     return Inertia::render('Profile');
 });
 
+use App\Http\Controllers\VideoController;
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile/edit', [ProfileController::class, 'edit']);
     Route::post('/profile/update', [ProfileController::class, 'update']);
+    Route::post('/videos', [VideoController::class, 'store']);
 });
