@@ -152,7 +152,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/profile/edit', [ProfileController::class, 'edit']);
     Route::post('/profile/update', [ProfileController::class, 'update']);
-    Route::post('/videos', [VideoController::class, 'store']);
+    Route::post('/v/upload', [VideoController::class, 'store']);
     
     // Social Features
     Route::post('/users/{user}/follow', [FollowController::class, 'toggle']);

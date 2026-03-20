@@ -75,15 +75,15 @@ class VideoController extends Controller
         $file = $request->file('video');
         $filename = time() . '_' . $file->getClientOriginalName();
         // Ensure directory exists
-        if (!file_exists(public_path('videos'))) {
-            @mkdir(public_path('videos'), 0777, true);
+        if (!file_exists(public_path('uploads/videos'))) {
+            @mkdir(public_path('uploads/videos'), 0777, true);
         }
 
-        $file->move(public_path('videos'), $filename);
+        $file->move(public_path('uploads/videos'), $filename);
 
         Video::create([
             'user_id' => Auth::id(),
-            'video_url' => '/videos/' . $filename,
+            'video_url' => '/uploads/videos/' . $filename,
             'thumbnail_url' => 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1000&auto=format&fit=crop',
             'caption' => $request->caption,
             'category' => $request->category,
