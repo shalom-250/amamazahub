@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import AppLayout from '../Components/AppLayout';
 import { Head, usePage, Link } from '@inertiajs/react';
-import { MessageSquare, MoreHorizontal, Send, ChevronLeft, Search, BadgeCheck, Users, Plus, Image as ImageIcon, Smile } from 'lucide-react';
+import { MessageSquare, MoreHorizontal, Send, ChevronLeft, Search, BadgeCheck, Users, Plus, Image as ImageIcon, Smile, Mic, Square, X, Play, Pause } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
@@ -14,7 +14,20 @@ export default function Messages({ conversations: initialConversations }) {
     const [isSending, setIsSending] = useState(false);
     const [showUserSelector, setShowUserSelector] = useState(false);
     const [following, setFollowing] = useState([]);
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const [previewImage, setPreviewImage] = useState(null);
+    const [isRecording, setIsRecording] = useState(false);
+    const [playingAudioId, setPlayingAudioId] = useState(null);
+    const mediaRecorderRef = useRef(null);
+    const audioChunksRef = useRef([]);
+    const mediaInputRef = useRef(null);
     const messagesEndRef = useRef(null);
+
+    const emojis = [
+        '❤️', '🙌', '🔥', '👏', '😢', '😍', '😮', '😂', '✨', '💯', '🙏', '🥺', '✅', '🚀', '🎁', '🎉',
+        '👍', '👎', '👌', '⭐', '🎈', '🎨', '🎶', '🍔', '🍕', '🍦', '🌍', '⚡', '💡', '💎', '🔑', '❤️‍🔥',
+        '🥰', '😎', '🤩', '🤔', '🥳', '👻', '👑', '💸', '💪', '🤳', '📍'
+    ];
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -25,8 +38,10 @@ export default function Messages({ conversations: initialConversations }) {
     }, [messages]);
 
     const fetchMessages = async (user) => {
+        if (isSending) return; // Don't poll while sending to avoid vanishing message bug
         try {
             const response = await axios.get(`/api/messages/${user.id}`);
+            // Only update if we have new messages or different count
             setMessages(response.data);
             setSelectedUser(user);
         } catch (error) {
@@ -34,31 +49,104 @@ export default function Messages({ conversations: initialConversations }) {
         }
     };
 
-    const handleSendMessage = async (e) => {
-        e.preventDefault();
-        if (!newMessage.trim() || !selectedUser || isSending) return;
+    const handleSendMessage = async (e, type = 'text', file = null) => {
+        if (e) e.preventDefault();
+        if ((!newMessage.trim() && !file) || !selectedUser || isSending) return;
 
         setIsSending(true);
+        const formData = new FormData();
+        formData.append('message', newMessage);
+        formData.append('type', type);
+        if (file) formData.append('file', file);
+
         const tempMsg = {
             id: Date.now(),
             sender_id: auth.user.id,
             receiver_id: selectedUser.id,
             message: newMessage,
+            type: type,
+            file_url: file ? URL.createObjectURL(file) : null,
             created_at: new Date().toISOString()
         };
         
         setMessages([...messages, tempMsg]);
         setNewMessage('');
+        setShowEmojiPicker(false);
 
         try {
-            await axios.post(`/api/messages/${selectedUser.id}`, {
-                message: newMessage
+            await axios.post(`/api/messages/${selectedUser.id}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
-            // Optionally re-fetch to get real ID and timestamp
+            // Re-fetch immediately to get the synced state (with real database IDs)
+            const syncRes = await axios.get(`/api/messages/${selectedUser.id}`);
+            setMessages(syncRes.data);
         } catch (error) {
             console.error('Error sending message', error);
+            // Remove the optimistic message on failure
+            setMessages(prev => prev.filter(m => m.id !== tempMsg.id));
         } finally {
             setIsSending(false);
+        }
+    };
+
+    const handleFileSelect = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const type = file.type.startsWith('video/') ? 'video' : 'image';
+        handleSendMessage(null, type, file);
+    };
+
+    const startRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const mediaRecorder = new MediaRecorder(stream);
+            mediaRecorderRef.current = mediaRecorder;
+            audioChunksRef.current = [];
+
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) audioChunksRef.current.push(e.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+                const audioFile = new File([audioBlob], "voice_message.webm", { type: 'audio/webm' });
+                handleSendMessage(null, 'audio', audioFile);
+                stream.getTracks().forEach(track => track.stop());
+            };
+
+            mediaRecorder.start();
+            setIsRecording(true);
+        } catch (error) {
+            console.error('Error starting recording', error);
+            alert('Could not access microphone');
+        }
+    };
+
+    const stopRecording = () => {
+        if (mediaRecorderRef.current && isRecording) {
+            mediaRecorderRef.current.stop();
+            setIsRecording(false);
+        }
+    };
+
+    const toggleAudio = (messageId) => {
+        const audio = document.getElementById(`audio_${messageId}`);
+        if (!audio) return;
+
+        if (playingAudioId === messageId) {
+            audio.pause();
+            setPlayingAudioId(null);
+        } else {
+            // Stop current playing
+            if (playingAudioId) {
+                const current = document.getElementById(`audio_${playingAudioId}`);
+                if (current) current.pause();
+            }
+            audio.play();
+            setPlayingAudioId(messageId);
+            
+            audio.onended = () => setPlayingAudioId(null);
         }
     };
 
@@ -99,7 +187,7 @@ export default function Messages({ conversations: initialConversations }) {
             fetchMessages(selectedUser);
         }, 4000);
         return () => clearInterval(interval);
-    }, [selectedUser]);
+    }, [selectedUser, isSending]); // Added isSending to deps to prevent stale closures and vanishing message bug
 
     return (
         <AppLayout>
@@ -202,13 +290,65 @@ export default function Messages({ conversations: initialConversations }) {
                                             animate={{ opacity: 1, y: 0, scale: 1 }}
                                             className={`flex ${m.sender_id === auth.user.id ? 'justify-end' : 'justify-start'}`}
                                         >
-                                            <div className={`max-w-[75%] p-4 rounded-[24px] text-sm font-medium shadow-2xl relative ${
-                                                m.sender_id === auth.user.id 
-                                                ? 'bg-primary text-black rounded-tr-sm' 
-                                                : 'bg-gray-900 text-white rounded-tl-sm border border-white/5'
-                                            }`}>
-                                                {m.message}
-                                                <span className={`block text-[9px] mt-2 font-black uppercase opacity-60 ${m.sender_id === auth.user.id ? 'text-black/70' : 'text-gray-500'}`}>
+                                            <div className={`max-w-[75%] space-y-2 flex flex-col ${m.sender_id === auth.user.id ? 'items-end' : 'items-start'}`}>
+                                                <div className={`p-4 rounded-[24px] text-sm font-medium shadow-2xl relative overflow-hidden ${
+                                                    m.sender_id === auth.user.id 
+                                                    ? 'bg-primary text-black rounded-tr-sm' 
+                                                    : 'bg-gray-900 text-white rounded-tl-sm border border-white/5'
+                                                }`}>
+                                                    {m.file_url && (
+                                                        <div className="mb-3 rounded-xl overflow-hidden bg-black/20">
+                                                            {m.type === 'image' ? (
+                                                                <img 
+                                                                    src={m.file_url} 
+                                                                    className="max-h-[300px] max-w-full rounded-xl object-contain cursor-pointer hover:opacity-90 transition shadow-lg" 
+                                                                    alt="Sent media" 
+                                                                    onClick={() => setPreviewImage(m.file_url)}
+                                                                />
+                                                            ) : m.type === 'video' ? (
+                                                                <video src={m.file_url} controls className="max-h-[300px] max-w-full rounded-xl" />
+                                                            ) : m.type === 'audio' ? (
+                                                                <div 
+                                                                    onClick={() => toggleAudio(m.id)}
+                                                                    className="p-3 bg-black/40 rounded-2xl min-w-[220px] cursor-pointer hover:bg-black/60 transition group overflow-hidden relative"
+                                                                >
+                                                                    <div className="flex items-center space-x-4 relative z-10">
+                                                                        <div className={`w-12 h-12 rounded-full flex items-center justify-center transition shadow-lg ${playingAudioId === m.id ? 'bg-primary text-black' : 'bg-primary/20 text-primary group-hover:scale-110'}`}>
+                                                                            {playingAudioId === m.id ? <Pause size={20} fill="currentColor" /> : <Play size={20} className="ml-1" fill="currentColor" />}
+                                                                        </div>
+                                                                        <div className="flex-1">
+                                                                            <div className="flex items-center space-x-2 mb-1">
+                                                                                <Mic size={12} className="text-primary" />
+                                                                                <span className="text-[9px] uppercase font-black tracking-widest opacity-60">Voice Message</span>
+                                                                            </div>
+                                                                            <div className="flex items-end space-x-0.5 h-6">
+                                                                                {[...Array(12)].map((_, i) => (
+                                                                                    <div 
+                                                                                        key={i} 
+                                                                                        className={`w-1 rounded-full bg-primary/40 transition-all duration-300 ${playingAudioId === m.id ? 'animate-pulse' : ''}`}
+                                                                                        style={{ 
+                                                                                            height: `${Math.random() * 80 + 20}%`,
+                                                                                            animationDelay: `${i * 0.1}s`
+                                                                                        }}
+                                                                                    />
+                                                                                ))}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <audio id={`audio_${m.id}`} src={m.file_url} className="hidden" />
+                                                                    {playingAudioId === m.id && (
+                                                                        <motion.div 
+                                                                            layoutId="audio-glow"
+                                                                            className="absolute inset-0 bg-primary/5 blur-xl pointer-events-none"
+                                                                        />
+                                                                    )}
+                                                                </div>
+                                                            ) : null}
+                                                        </div>
+                                                    )}
+                                                    {m.message && <span>{m.message}</span>}
+                                                </div>
+                                                <span className={`text-[9px] font-black uppercase opacity-60 px-2 ${m.sender_id === auth.user.id ? 'text-primary' : 'text-gray-500'}`}>
                                                     {new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </span>
                                             </div>
@@ -219,10 +359,21 @@ export default function Messages({ conversations: initialConversations }) {
                             </div>
 
                             {/* Sticky Chat Input */}
-                            <div className="p-6 bg-black/60 backdrop-blur-md border-t border-gray-900 sticky bottom-0">
+                            <div className="p-6 bg-black/60 backdrop-blur-md border-t border-gray-900 sticky bottom-0 z-40">
                                 <form onSubmit={handleSendMessage} className="flex items-center space-x-4">
                                     <div className="flex-1 bg-gray-900/80 border border-white/5 rounded-2xl flex items-center px-4 py-1.5 focus-within:border-primary/50 transition group">
-                                        <button type="button" className="text-gray-500 hover:text-white p-2">
+                                        <input 
+                                            type="file" 
+                                            ref={mediaInputRef} 
+                                            onChange={handleFileSelect} 
+                                            className="hidden" 
+                                            accept="image/*,video/*"
+                                        />
+                                        <button 
+                                            type="button" 
+                                            onClick={() => mediaInputRef.current.click()}
+                                            className="text-gray-500 hover:text-white p-2"
+                                        >
                                             <Plus size={22} />
                                         </button>
                                         <input 
@@ -231,18 +382,72 @@ export default function Messages({ conversations: initialConversations }) {
                                             placeholder="Write a message..."
                                             className="bg-transparent border-none flex-1 focus:ring-0 text-white text-sm py-3 px-2 placeholder:text-gray-600 font-medium"
                                         />
-                                        <div className="flex items-center space-x-2 text-gray-500">
-                                            <Smile size={20} className="hover:text-white cursor-pointer transition" />
-                                            <ImageIcon size={20} className="hover:text-white cursor-pointer transition" />
+                                        <div className="flex items-center space-x-2 text-gray-500 relative">
+                                            {isRecording ? (
+                                                <div className="flex items-center bg-red-500/20 px-3 py-1 rounded-full space-x-2 animate-pulse">
+                                                    <div className="w-2 h-2 bg-red-500 rounded-full" />
+                                                    <span className="text-[10px] font-black text-red-500 uppercase tracking-tighter">Recording...</span>
+                                                    <button 
+                                                        type="button" 
+                                                        onClick={stopRecording}
+                                                        className="p-1 hover:bg-red-500 rounded-full transition text-white"
+                                                    >
+                                                        <Square size={14} fill="currentColor" />
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center space-x-2">
+                                                    <div className="relative">
+                                                        <Smile 
+                                                            size={22} 
+                                                            className={`cursor-pointer transition ${showEmojiPicker ? 'text-primary' : 'hover:text-white'}`} 
+                                                            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                                                        />
+                                                        <AnimatePresence>
+                                                            {showEmojiPicker && (
+                                                                <motion.div 
+                                                                    initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                                    exit={{ opacity: 0, y: 10, scale: 0.9 }}
+                                                                    className="absolute bottom-full right-0 mb-4 bg-gray-950 border border-white/10 rounded-2xl p-4 shadow-2xl w-[250px] grid grid-cols-6 gap-2 z-50 overflow-y-auto max-h-[200px] custom-scrollbar"
+                                                                >
+                                                                    {emojis.map(e => (
+                                                                        <button 
+                                                                            key={e} 
+                                                                            type="button"
+                                                                            onClick={() => {
+                                                                                setNewMessage(newMessage + e);
+                                                                            }}
+                                                                            className="text-2xl hover:scale-125 transition active:scale-95"
+                                                                        >
+                                                                            {e}
+                                                                        </button>
+                                                                    ))}
+                                                                </motion.div>
+                                                            )}
+                                                        </AnimatePresence>
+                                                    </div>
+                                                    <Mic 
+                                                        size={22} 
+                                                        className="hover:text-white cursor-pointer transition" 
+                                                        onClick={startRecording}
+                                                    />
+                                                    <ImageIcon 
+                                                        size={22} 
+                                                        className="hover:text-white cursor-pointer transition" 
+                                                        onClick={() => mediaInputRef.current.click()}
+                                                    />
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                     <motion.button 
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
-                                        disabled={!newMessage.trim() || isSending}
+                                        disabled={(!newMessage.trim()) || isSending}
                                         className="w-14 h-14 bg-primary text-black rounded-2xl flex items-center justify-center hover:brightness-110 shadow-lg shadow-primary/20 disabled:opacity-50 disabled:grayscale transition"
                                     >
-                                        <Send size={24} strokeWidth={2.5} className="rotate-0" />
+                                        <Send size={24} strokeWidth={2.5} />
                                     </motion.button>
                                 </form>
                             </div>
@@ -349,6 +554,62 @@ export default function Messages({ conversations: initialConversations }) {
                     )}
                 </AnimatePresence>
             </div>
+            {/* Image Preview Lightbox */}
+            <AnimatePresence>
+                {previewImage && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[200] flex items-center justify-center p-8 bg-black/95 backdrop-blur-xl"
+                        onClick={() => setPreviewImage(null)}
+                    >
+                        <button 
+                            className="absolute top-8 right-8 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition backdrop-blur-md"
+                            onClick={() => setPreviewImage(null)}
+                        >
+                            <X size={32} />
+                        </button>
+                        <motion.img 
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            src={previewImage} 
+                            className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl"
+                            onClick={(e) => e.stopPropagation()}
+                        />
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <style dangerouslySetInnerHTML={{ __html: `
+                .custom-audio-player::-webkit-media-controls-enclosure {
+                    background-color: transparent !important;
+                }
+                .custom-audio-player::-webkit-media-controls-panel {
+                    background-color: #000000 !important;
+                    border-radius: 12px;
+                }
+                .custom-audio-player::-webkit-media-controls-current-time-display,
+                .custom-audio-player::-webkit-media-controls-time-remaining-display {
+                    color: #ffffff !important;
+                    font-size: 10px;
+                    font-weight: bold;
+                }
+                .custom-scrollbar::-webkit-scrollbar {
+                    width: 4px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background: rgba(255, 255, 255, 0.1);
+                    border-radius: 10px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background: rgba(255, 255, 255, 0.2);
+                }
+            `}} />
         </AppLayout>
     );
 }
