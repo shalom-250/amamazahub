@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\VideoController;
+use App\Http\Controllers\FollowController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -33,10 +35,114 @@ Route::get('/profile', function () {
     return Inertia::render('Profile');
 });
 
-use App\Http\Controllers\VideoController;
+Route::get('/following', [FollowController::class, 'index'])->name('following');
+
+Route::get('/notifications', function () {
+    return Inertia::render('Notifications');
+});
+
+Route::get('/live', function () {
+    return Inertia::render('Live');
+});
 
 Route::middleware('auth')->group(function () {
+    Route::get('/settings', function () {
+        return Inertia::render('Settings');
+    });
+
+    Route::get('/creator-tools', function () {
+        return Inertia::render('CreatorTools');
+    });
+
+    Route::get('/wallet', function () {
+        return Inertia::render('Wallet');
+    });
+
+    Route::get('/help', function () {
+        return Inertia::render('HelpCenter');
+    });
+
+    Route::get('/friends', function () {
+        return Inertia::render('Friends');
+    });
+
+    Route::get('/search', function () {
+        return Inertia::render('Search');
+    });
+
+    Route::get('/shop', function () {
+        return Inertia::render('Shop');
+    });
+
+    Route::get('/shop/product/1', function () {
+        return Inertia::render('ProductDetail');
+    });
+
+    Route::get('/shop/cart', function () {
+        return Inertia::render('Cart');
+    });
+
+    Route::get('/shop/orders', function () {
+        return Inertia::render('Orders');
+    });
+
+    Route::get('/shop/seller', function () {
+        return Inertia::render('SellerCenter');
+    });
+
+    Route::get('/shop/addresses', function () {
+        return Inertia::render('AddressBook');
+    });
+
+    Route::get('/shop/payments', function () {
+        return Inertia::render('Payments');
+    });
+
+    Route::get('/shop/checkout', function () {
+        return Inertia::render('Checkout');
+    });
+
+    Route::get('/shop/promos', function () {
+        return Inertia::render('Promotions');
+    });
+
+    Route::get('/shop/discovery', function () {
+        return Inertia::render('ShopSearch');
+    });
+
+    Route::get('/video-detail', function () {
+        return Inertia::render('VideoDetail');
+    });
+
+    Route::get('/privacy', function () {
+        return Inertia::render('Privacy');
+    });
+
+    Route::get('/safety', function () {
+        return Inertia::render('Safety');
+    });
+
+    Route::get('/activity', function () {
+        return Inertia::render('Activity');
+    });
+
+    Route::get('/guidelines', function () {
+        return Inertia::render('Guidelines');
+    });
+
+    Route::get('/preferences', function () {
+        return Inertia::render('Preferences');
+    });
+
+    Route::get('/story', function () {
+        return Inertia::render('StoryCreator');
+    });
+
     Route::get('/profile/edit', [ProfileController::class, 'edit']);
     Route::post('/profile/update', [ProfileController::class, 'update']);
     Route::post('/videos', [VideoController::class, 'store']);
+    
+    // Social Features
+    Route::post('/users/{user}/follow', [FollowController::class, 'toggle']);
+    Route::get('/api/suggested', [FollowController::class, 'suggested']);
 });

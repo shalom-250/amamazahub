@@ -2,7 +2,7 @@ import React from 'react';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import { Link, usePage } from '@inertiajs/react';
-import { Home, Compass, Plus, MessageSquare, User, Search } from 'lucide-react';
+import { Home, Compass, Plus, MessageSquare, User, Search, Bell, Users, ShoppingBag } from 'lucide-react';
 
 export default function AppLayout({ children }) {
     const { props } = usePage();
@@ -39,19 +39,23 @@ export default function AppLayout({ children }) {
                     <Home size={24} />
                     <span className="text-[10px] mt-1 font-bold">Home</span>
                 </Link>
-                <Link href="/explore" className="text-gray-400 flex flex-col items-center">
-                    <Search size={24} />
-                    <span className="text-[10px] mt-1">Explore</span>
+                <Link href="/friends" className="text-gray-400 flex flex-col items-center">
+                    <Users size={24} />
+                    <span className="text-[10px] mt-1">Friends</span>
                 </Link>
-                <Link href="/upload" className="relative group mx-2">
+                <Link href="/shop" className="text-gray-400 flex flex-col items-center">
+                    <ShoppingBag size={24} />
+                    <span className="text-[10px] mt-1">Shop</span>
+                </Link>
+                <Link href="/story" className="relative group mx-2">
                     <div className="bg-white rounded-lg px-3 py-1.5 flex items-center justify-center relative z-10">
                         <Plus size={20} className="text-black" />
                     </div>
                     <div className="absolute inset-0 bg-primary -left-1 rounded-lg"></div>
                     <div className="absolute inset-0 bg-cyan-400 -right-1 rounded-lg"></div>
                 </Link>
-                <Link href="/messages" className="text-gray-400 flex flex-col items-center">
-                    <MessageSquare size={24} />
+                <Link href="/notifications" className="text-gray-400 flex flex-col items-center">
+                    <Bell size={24} />
                     <span className="text-[10px] mt-1">Inbox</span>
                 </Link>
                 <Link href="/profile" className="text-gray-400 flex flex-col items-center">

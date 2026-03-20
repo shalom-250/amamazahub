@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Heart, MessageCircle, Share2, Bookmark, Music2, Plus, CheckCircle2 } from 'lucide-react';
+import { Link } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function VideoCard({ video }) {
@@ -114,17 +115,19 @@ export default function VideoCard({ video }) {
 
                 {/* Bottom Left Info */}
                 <div className="absolute bottom-4 left-4 right-16 space-y-3 z-10 text-white drop-shadow-lg">
-                    <motion.h3
-                        initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        className="font-bold text-lg hover:underline cursor-pointer flex items-center"
-                    >
-                        @{video.user}
-                        {video.user === 'amazamahub_official' && (
-                            <CheckCircle2 size={16} className="ml-1 text-cyan-400 fill-cyan-400/20" />
-                        )}
-                    </motion.h3>
-                    <p className="text-sm line-clamp-2 pr-4">{video.caption}</p>
+                    <Link href="/video-detail" className="block group/text">
+                        <motion.h3
+                            initial={{ opacity: 0, x: -20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            className="font-bold text-lg hover:underline flex items-center"
+                        >
+                            @{video.user}
+                            {video.user === 'amazamahub_official' && (
+                                <CheckCircle2 size={16} className="ml-1 text-cyan-400 fill-cyan-400/20" />
+                            )}
+                        </motion.h3>
+                        <p className="text-sm line-clamp-2 pr-4">{video.caption}</p>
+                    </Link>
                     <div className="flex items-center space-x-2 text-sm font-semibold truncate group/music">
                         <Music2 size={14} className="music-disc" />
                         <span className="hover:underline cursor-pointer">{video.music}</span>
@@ -135,9 +138,9 @@ export default function VideoCard({ video }) {
                 <div className="absolute bottom-6 right-2 flex flex-col items-center space-y-5 z-10">
                     {/* User Profile Info */}
                     <div className="relative mb-2">
-                        <div className="w-12 h-12 rounded-full border-2 border-white overflow-hidden bg-primary/20 flex items-center justify-center font-bold text-white shadow-xl">
+                        <Link href="/profile" className="w-12 h-12 rounded-full border-2 border-white overflow-hidden bg-primary/20 flex items-center justify-center font-bold text-white shadow-xl hover:scale-105 transition block">
                             {video.user?.[0]?.toUpperCase() || 'U'}
-                        </div>
+                        </Link>
                         <AnimatePresence>
                             {!isFollowed && (
                                 <motion.button
