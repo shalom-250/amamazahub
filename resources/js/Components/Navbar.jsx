@@ -3,7 +3,7 @@ import { Search, Plus, MoreVertical, MessageSquare, Bell, User } from 'lucide-re
 
 export default function Navbar() {
     return (
-        <nav className="h-16 border-b border-gray-800 flex items-center justify-between px-4 md:px-6 bg-black z-50 sticky top-0">
+        <nav className="h-16 border-b border-gray-800/50 flex items-center justify-between px-4 md:px-6 bg-black/80 backdrop-blur-xl z-50 sticky top-0">
             <div className="flex items-center space-x-2 min-w-[150px]">
                 <span className="text-primary text-2xl font-black italic tracking-tighter cursor-pointer">AMAZAMAHUB</span>
             </div>

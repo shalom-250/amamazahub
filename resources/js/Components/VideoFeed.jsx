@@ -13,7 +13,7 @@ export default function VideoFeed() {
             comments: '15.4K',
             saves: '120K',
             shares: '50K',
-            url: 'https://v1.pexels.com/video-files/5847427/5847427-uhd_2160_3840_24fps.mp4'
+            url: 'https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_1mb.mp4'
         },
         {
             id: 2,
@@ -24,7 +24,7 @@ export default function VideoFeed() {
             comments: '5K',
             saves: '40K',
             shares: '10K',
-            url: 'https://v1.pexels.com/video-files/7023156/7023156-uhd_2160_3840_25fps.mp4'
+            url: 'https://vjs.zencdn.net/v/oceans.mp4'
         },
         {
             id: 3,
@@ -35,7 +35,7 @@ export default function VideoFeed() {
             comments: '2K',
             saves: '30K',
             shares: '5K',
-            url: 'https://v1.pexels.com/video-files/3209828/3209828-uhd_2560_1440_25fps.mp4'
+            url: 'https://www.w3schools.com/html/movie.mp4'
         },
     ];
 

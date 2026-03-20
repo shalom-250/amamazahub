@@ -1,19 +1,53 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Heart, MessageCircle, Share2, Bookmark, Music2, Plus } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Bookmark, Music2, Plus, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function VideoCard({ video }) {
     const videoRef = useRef(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
+    const [isFollowed, setIsFollowed] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const [lastTap, setLastTap] = useState(0);
+    const [showHeart, setShowHeart] = useState(null); // { x, y, id }
 
-    const togglePlay = () => {
+    const togglePlay = (e) => {
+        // Handle double tap for like
+        const now = Date.now();
+        if (now - lastTap < 300) {
+            handleDoubleTap(e);
+            setLastTap(0);
+            return;
+        }
+        setLastTap(now);
+
         if (videoRef.current.paused) {
             videoRef.current.play();
             setIsPlaying(true);
         } else {
             videoRef.current.pause();
             setIsPlaying(false);
+        }
+    };
+
+    const handleDoubleTap = (e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        setIsLiked(true);
+        const id = Math.random();
+        setShowHeart({ x, y, id });
+
+        setTimeout(() => {
+            setShowHeart(prev => prev?.id === id ? null : prev);
+        }, 1000);
+    };
+
+    const handleTimeUpdate = () => {
+        if (videoRef.current) {
+            const p = (videoRef.current.currentTime / videoRef.current.duration) * 100;
+            setProgress(p);
         }
     };
 
@@ -43,11 +77,28 @@ export default function VideoCard({ video }) {
                 <video
                     ref={videoRef}
                     onClick={togglePlay}
+                    onTimeUpdate={handleTimeUpdate}
                     loop
+                    playsInline
                     className="w-full h-full object-cover cursor-pointer"
                     src={video.url}
-                    playsInline
                 />
+
+                {/* Double Tap Heart Animation */}
+                <AnimatePresence>
+                    {showHeart && (
+                        <motion.div
+                            key={showHeart.id}
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1.5, opacity: 1 }}
+                            exit={{ scale: 2, opacity: 0 }}
+                            style={{ left: showHeart.x - 40, top: showHeart.y - 40 }}
+                            className="absolute pointer-events-none z-50 text-primary"
+                        >
+                            <Heart fill="currentColor" size={80} />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
                 {!isPlaying && (
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -69,6 +120,9 @@ export default function VideoCard({ video }) {
                         className="font-bold text-lg hover:underline cursor-pointer flex items-center"
                     >
                         @{video.user}
+                        {video.user === 'amazamahub_official' && (
+                            <CheckCircle2 size={16} className="ml-1 text-cyan-400 fill-cyan-400/20" />
+                        )}
                     </motion.h3>
                     <p className="text-sm line-clamp-2 pr-4">{video.caption}</p>
                     <div className="flex items-center space-x-2 text-sm font-semibold truncate group/music">
@@ -84,9 +138,19 @@ export default function VideoCard({ video }) {
                         <div className="w-12 h-12 rounded-full border-2 border-white overflow-hidden bg-primary/20 flex items-center justify-center font-bold text-white shadow-xl">
                             {video.user?.[0]?.toUpperCase() || 'U'}
                         </div>
-                        <button className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-primary text-black rounded-full p-1 hover:scale-110 transition shadow-lg">
-                            <Plus size={12} strokeWidth={4} />
-                        </button>
+                        <AnimatePresence>
+                            {!isFollowed && (
+                                <motion.button
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    exit={{ scale: 0 }}
+                                    onClick={() => setIsFollowed(true)}
+                                    className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-primary text-black rounded-full p-1 hover:scale-110 transition shadow-lg"
+                                >
+                                    <Plus size={12} strokeWidth={4} />
+                                </motion.button>
+                            )}
+                        </AnimatePresence>
                     </div>
 
                     {/* Like Button */}
@@ -130,6 +194,14 @@ export default function VideoCard({ video }) {
                             </div>
                         </div>
                     </div>
+                </div>
+
+                {/* Video Progress Bar */}
+                <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/20 z-20">
+                    <motion.div
+                        className="h-full bg-white opacity-60"
+                        style={{ width: `${progress}%` }}
+                    />
                 </div>
             </div>
         </div>

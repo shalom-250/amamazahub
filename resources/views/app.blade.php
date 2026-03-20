@@ -6,7 +6,7 @@
         <title inertia>{{ config('app.name', 'AmazamaHub') }}</title>
         @routes
         @viteReactRefresh
-        @vite(['resources/js/app.jsx', "resources/js/Pages/{{ \$page['component'] }}.jsx"])
+        @vite(['resources/js/app.jsx', "resources/js/Pages/{$page['component']}.jsx"])
         @inertiaHead
     </head>
     <body class="font-sans antialiased bg-black text-white">
