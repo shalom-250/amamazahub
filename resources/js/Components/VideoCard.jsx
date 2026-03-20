@@ -1,7 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Heart, MessageCircle, Share2, Bookmark, Music2, Plus, CheckCircle2 } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Bookmark, Music2, Plus, CheckCircle2, Repeat } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 
 export default function VideoCard({ video }) {
     const videoRef = useRef(null);
@@ -9,6 +10,11 @@ export default function VideoCard({ video }) {
     const [isLiked, setIsLiked] = useState(video.likes_exists || false);
     const [likesCount, setLikesCount] = useState(video.likes_count || 0);
     const [isFollowed, setIsFollowed] = useState(video.user.is_followed || false);
+    const [isReposted, setIsReposted] = useState(video.reposts_exists || false);
+    const [repostsCount, setRepostsCount] = useState(video.reposts_count || 0);
+    const [isBookmarked, setIsBookmarked] = useState(video.bookmarks_exists || false);
+    const [bookmarksCount, setBookmarksCount] = useState(video.bookmarks_count || 0);
+    const [sharesCount, setSharesCount] = useState(video.shares_count || 0);
 
     const toggleFollow = async () => {
         try {
@@ -16,6 +22,37 @@ export default function VideoCard({ video }) {
             setIsFollowed(response.data.following);
         } catch (error) {
             console.error('Error toggling follow', error);
+        }
+    };
+
+    const toggleRepost = async () => {
+        try {
+            const response = await axios.post(`/videos/${video.id}/repost`);
+            setIsReposted(response.data.reposted);
+            setRepostsCount(response.data.reposts_count);
+        } catch (error) {
+            console.error('Error toggling repost', error);
+        }
+    };
+
+    const toggleBookmark = async () => {
+        try {
+            const response = await axios.post(`/videos/${video.id}/bookmark`);
+            setIsBookmarked(response.data.bookmarked);
+            setBookmarksCount(response.data.bookmarks_count);
+        } catch (error) {
+            console.error('Error toggling bookmark', error);
+        }
+    };
+
+    const handleShare = async () => {
+        try {
+            const response = await axios.post(`/videos/${video.id}/share`);
+            setSharesCount(response.data.shares_count);
+            // Show a "Copy Link" or "Shared" success message if possible
+            alert('Link copied and shared!');
+        } catch (error) {
+            console.error('Error sharing', error);
         }
     };
     const [showComments, setShowComments] = useState(false);
@@ -241,20 +278,39 @@ export default function VideoCard({ video }) {
                     </div>
 
                     {/* Bookmark Button */}
-                    <div className="flex flex-col items-center group cursor-pointer">
-                        <div className="w-12 h-12 bg-gray-900/60 backdrop-blur-xl rounded-full flex items-center justify-center text-white shadow-2xl transition group-hover:bg-gray-800/80">
-                            <Bookmark size={26} />
-                        </div>
+                    <div className="flex flex-col items-center group cursor-pointer" onClick={toggleBookmark}>
+                        <motion.div
+                            animate={isBookmarked ? { scale: [1, 1.3, 1] } : {}}
+                            className={`w-12 h-12 bg-gray-900/60 backdrop-blur-xl rounded-full flex items-center justify-center transition shadow-2xl ${isBookmarked ? 'text-yellow-400' : 'text-white'}`}
+                        >
+                            <Bookmark size={26} fill={isBookmarked ? 'currentColor' : 'none'} strokeWidth={isBookmarked ? 0 : 2} />
+                        </motion.div>
                         <span className="text-[10px] font-black mt-1 shadow-black text-white uppercase tracking-tighter">
-                            {Math.floor(video.likes_count / 15)}
+                            {Intl.NumberFormat('en-US', { notation: 'compact' }).format(bookmarksCount)}
                         </span>
                     </div>
 
-                    <div className="flex flex-col items-center group cursor-pointer">
-                        <div className="w-12 h-12 bg-gray-800/40 backdrop-blur-md rounded-full flex items-center justify-center text-white">
-                            <Share2 size={28} />
+                    {/* Repost Button */}
+                    <div className="flex flex-col items-center group cursor-pointer" onClick={toggleRepost}>
+                        <motion.div
+                            animate={isReposted ? { rotate: [0, 180, 360] } : {}}
+                            className={`w-12 h-12 bg-gray-900/60 backdrop-blur-xl rounded-full flex items-center justify-center transition shadow-2xl ${isReposted ? 'text-green-500' : 'text-white'}`}
+                        >
+                            <Repeat size={26} strokeWidth={isReposted ? 3 : 2} />
+                        </motion.div>
+                        <span className="text-[10px] font-black mt-1 shadow-black text-white uppercase tracking-tighter">
+                            {Intl.NumberFormat('en-US', { notation: 'compact' }).format(repostsCount)}
+                        </span>
+                    </div>
+
+                    {/* Share Button */}
+                    <div className="flex flex-col items-center group cursor-pointer" onClick={handleShare}>
+                        <div className="w-12 h-12 bg-gray-900/60 backdrop-blur-xl rounded-full flex items-center justify-center text-white shadow-2xl transition group-hover:bg-gray-800/80">
+                            <Share2 size={26} />
                         </div>
-                        <span className="text-xs font-bold mt-1 shadow-black text-white">{video.shares}</span>
+                        <span className="text-[10px] font-black mt-1 shadow-black text-white uppercase tracking-tighter">
+                            {Intl.NumberFormat('en-US', { notation: 'compact' }).format(sharesCount)}
+                        </span>
                     </div>
 
                     {/* Music Disc Icon */}

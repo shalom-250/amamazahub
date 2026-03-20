@@ -33,6 +33,7 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
+                'unread_messages_count' => $request->user() ? \App\Models\Message::where('receiver_id', $request->user()->id)->where('is_read', false)->count() : 0,
             ],
         ];
     }

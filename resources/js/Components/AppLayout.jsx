@@ -23,7 +23,14 @@ export default function AppLayout({ children }) {
                     <Link href="/"><Home size={32} className="text-primary cursor-pointer hover:scale-110 transition" /></Link>
                     <Link href="/explore"><Compass size={32} className="text-white cursor-pointer hover:scale-110 transition" /></Link>
                     <Link href="/upload"><Plus size={32} className="text-white cursor-pointer hover:scale-110 transition" /></Link>
-                    <Link href="/messages"><MessageSquare size={32} className="text-white cursor-pointer hover:scale-110 transition" /></Link>
+                    <Link href="/messages" className="relative group">
+                        <MessageSquare size={32} className="text-white cursor-pointer hover:scale-110 transition" />
+                        {props.auth.unread_messages_count > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-primary text-black text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-black border-2 border-black">
+                                {props.auth.unread_messages_count}
+                            </span>
+                        )}
+                    </Link>
                     <Link href={user ? `/profile/@${user.username}` : '/profile'}><User size={32} className="text-white cursor-pointer hover:scale-110 transition" /></Link>
                 </div>
 
@@ -54,8 +61,13 @@ export default function AppLayout({ children }) {
                     <div className="absolute inset-0 bg-primary -left-1 rounded-lg"></div>
                     <div className="absolute inset-0 bg-cyan-400 -right-1 rounded-lg"></div>
                 </Link>
-                <Link href="/notifications" className="text-gray-400 flex flex-col items-center">
+                <Link href="/notifications" className="text-gray-400 flex flex-col items-center relative">
                     <Bell size={24} />
+                    {props.auth.unread_messages_count > 0 && (
+                        <span className="absolute -top-1 right-2 bg-primary text-black text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-black border border-black">
+                            {props.auth.unread_messages_count}
+                        </span>
+                    )}
                     <span className="text-[10px] mt-1">Inbox</span>
                 </Link>
                 <Link href={user ? `/profile/@${user.username}` : '/profile'} className="text-gray-400 flex flex-col items-center">

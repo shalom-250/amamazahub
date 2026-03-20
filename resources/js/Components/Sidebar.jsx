@@ -4,13 +4,15 @@ import { Home, Compass, Upload, MessageSquare, User, LogIn, Users, CheckCircle2,
 import { usePage } from '@inertiajs/react';
 
 export default function Sidebar({ user }) {
-    const { url } = usePage();
+    const { url, props } = usePage();
+    const { auth } = props;
 
     const menus = [
         { name: 'Home', icon: <Home size={28} />, href: '/' },
         { name: 'Explore', icon: <Compass size={28} />, href: '/explore' },
         { name: 'Shop', icon: <ShoppingBag size={28} />, href: '/shop' },
         { name: 'Upload', icon: <Upload size={28} />, href: '/upload' },
+        { name: 'Messages', icon: <MessageSquare size={28} />, href: '/messages' },
         { name: 'Following', icon: <Users size={28} />, href: '/following' },
         { name: 'LIVE', icon: <Radio size={28} />, href: '/live' },
         { name: 'Friends', icon: <Users size={28} />, href: '/friends' },
@@ -34,8 +36,15 @@ export default function Sidebar({ user }) {
                         href={item.href}
                         className={`flex items-center justify-between w-full p-3 rounded-lg font-bold text-lg hover:bg-gray-900/50 transition group ${isActive(item.href) ? 'text-primary bg-primary/5' : 'text-white'}`}
                     >
-                        <div className="flex items-center space-x-4">
-                            <span className={isActive(item.href) ? 'text-primary' : 'text-white group-hover:text-primary transition-colors'}>{item.icon}</span>
+                        <div className="flex items-center space-x-4 relative">
+                            <span className={isActive(item.href) ? 'text-primary' : 'text-white group-hover:text-primary transition-colors'}>
+                                {item.icon}
+                                {item.name === 'Messages' && auth.unread_messages_count > 0 && (
+                                    <span className="absolute -top-1 -left-1 bg-primary text-black text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-black border-2 border-black">
+                                        {auth.unread_messages_count}
+                                    </span>
+                                )}
+                            </span>
                             <span className="hidden lg:block">{item.name}</span>
                         </div>
                         {item.name === 'LIVE' && (

@@ -18,6 +18,9 @@ class Video extends Model
         'music_name',
         'likes_count',
         'comments_count',
+        'reposts_count',
+        'shares_count',
+        'bookmarks_count',
     ];
 
     public function user()
@@ -33,5 +36,20 @@ class Video extends Model
     public function comments()
     {
         return $this->hasMany(Comment::class);
+    }
+
+    public function reposts()
+    {
+        return $this->hasMany(Repost::class);
+    }
+
+    public function shares()
+    {
+        return $this->hasMany(Share::class);
+    }
+
+    public function bookmarks()
+    {
+        return $this->hasMany(Bookmark::class);
     }
 }

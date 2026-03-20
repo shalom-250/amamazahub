@@ -13,9 +13,17 @@ class VideoController extends Controller
     {
         $type = $request->query('type', 'foryou');
 
-        $query = Video::with('user')->withExists(['likes' => function ($query) {
-            $query->where('user_id', Auth::id());
-        }]);
+        $query = Video::with('user')
+            ->withCount(['likes', 'comments', 'reposts', 'shares', 'bookmarks'])
+            ->withExists(['likes' => function ($query) {
+                $query->where('user_id', Auth::id());
+            }])
+            ->withExists(['reposts' => function ($query) {
+                $query->where('user_id', Auth::id());
+            }])
+            ->withExists(['bookmarks' => function ($query) {
+                $query->where('user_id', Auth::id());
+            }]);
 
         $query->with(['user' => function ($q) {
             $q->withExists(['followers as is_followed' => function ($f) {

@@ -60,6 +60,10 @@ class MessageController extends Controller
                 'name' => $user->name,
                 'username' => $user->username,
                 'avatar' => $user->avatar,
+                'unread_count' => Message::where('sender_id', $user->id)
+                    ->where('receiver_id', $userId)
+                    ->where('is_read', false)
+                    ->count(),
                 'last_message' => $preview,
                 'last_message_time' => $lastMessage ? $lastMessage->created_at->diffForHumans() : '',
             ];
@@ -73,6 +77,12 @@ class MessageController extends Controller
     public function getMessages(User $user)
     {
         $userId = Auth::id();
+
+        // Mark messages from this user as read
+        Message::where('sender_id', $user->id)
+            ->where('receiver_id', $userId)
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
 
         $messages = Message::where(function($q) use ($userId, $user) {
                 $q->where('sender_id', $userId)->where('receiver_id', $user->id);

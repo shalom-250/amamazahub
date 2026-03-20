@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\ExploreController;
+use App\Http\Controllers\SocialActionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -58,6 +59,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/wallet', function () {
         return Inertia::render('Wallet');
     });
+
+    // Social Actions
+    Route::post('/videos/{video}/like', [\App\Http\Controllers\LikeController::class, 'toggle']);
+    Route::post('/videos/{video}/comment', [\App\Http\Controllers\CommentController::class, 'store']);
+    Route::get('/videos/{video}/comments', [\App\Http\Controllers\CommentController::class, 'index']);
+    Route::post('/videos/{video}/repost', [SocialActionController::class, 'repost']);
+    Route::post('/videos/{video}/share', [SocialActionController::class, 'share']);
+    Route::post('/videos/{video}/bookmark', [SocialActionController::class, 'bookmark']);
+    Route::post('/users/{user}/follow', [\App\Http\Controllers\FollowController::class, 'toggle']);
 
     Route::get('/help', function () {
         return Inertia::render('HelpCenter');
