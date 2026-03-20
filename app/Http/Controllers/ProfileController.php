@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Models\Video;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -9,6 +11,40 @@ use Inertia\Inertia;
 
 class ProfileController extends Controller
 {
+    public function index()
+    {
+        if (!Auth::check()) return redirect('/login');
+        return $this->show(Auth::user()->username);
+    }
+
+    public function show($username)
+    {
+        $user = User::where('username', $username)->firstOrFail();
+        
+        $videos = $user->videos()->latest()->get();
+        
+        $stats = [
+            'following' => $user->following()->count(),
+            'followers' => $user->followers()->count(),
+            'likes' => $user->videos()->sum('likes_count'),
+        ];
+
+        $isOwnProfile = Auth::id() === $user->id;
+        $isFollowing = false;
+        
+        if (Auth::check() && !$isOwnProfile) {
+            $isFollowing = Auth::user()->isFollowing($user);
+        }
+
+        return Inertia::render('Profile', [
+            'profileUser' => $user,
+            'videos' => $videos,
+            'stats' => $stats,
+            'isFollowing' => $isFollowing,
+            'isOwnProfile' => $isOwnProfile,
+        ]);
+    }
+
     public function edit()
     {
         return Inertia::render('Profile/Edit', [
@@ -34,8 +70,7 @@ class ProfileController extends Controller
         $user->bio = $request->bio;
 
         if ($request->hasFile('avatar')) {
-            // Delete old avatar if exists
-            if ($user->avatar) {
+            if ($user->avatar && str_contains($user->avatar, '/storage/')) {
                 Storage::delete(str_replace('/storage/', 'public/', $user->avatar));
             }
             
@@ -45,6 +80,6 @@ class ProfileController extends Controller
 
         $user->save();
 
-        return redirect('/profile');
+        return redirect("/profile/@{$user->username}");
     }
 }

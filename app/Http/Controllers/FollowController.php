@@ -38,8 +38,14 @@ class FollowController extends Controller
 
         if ($follower->isFollowing($user)) {
             $follower->following()->detach($user->id);
+            $following = false;
         } else {
             $follower->following()->attach($user->id);
+            $following = true;
+        }
+
+        if (request()->wantsJson()) {
+            return response()->json(['following' => $following]);
         }
 
         return back();
@@ -58,5 +64,12 @@ class FollowController extends Controller
             ->get();
 
         return response()->json($suggested);
+    }
+
+    public function following()
+    {
+        $user = Auth::user();
+        $following = $user ? $user->following()->get() : [];
+        return response()->json($following);
     }
 }

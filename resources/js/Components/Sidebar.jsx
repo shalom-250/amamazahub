@@ -14,7 +14,7 @@ export default function Sidebar({ user }) {
         { name: 'Following', icon: <Users size={28} />, href: '/following' },
         { name: 'LIVE', icon: <Radio size={28} />, href: '/live' },
         { name: 'Friends', icon: <Users size={28} />, href: '/friends' },
-        { name: 'Profile', icon: <User size={28} />, href: '/profile' },
+        { name: 'Profile', icon: <User size={28} />, href: user ? `/profile/@${user.username}` : '/profile' },
         { name: 'Settings', icon: <Settings size={28} />, href: '/settings' },
     ];
 

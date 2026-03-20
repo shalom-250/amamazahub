@@ -24,7 +24,7 @@ export default function AppLayout({ children }) {
                     <Link href="/explore"><Compass size={32} className="text-white cursor-pointer hover:scale-110 transition" /></Link>
                     <Link href="/upload"><Plus size={32} className="text-white cursor-pointer hover:scale-110 transition" /></Link>
                     <Link href="/messages"><MessageSquare size={32} className="text-white cursor-pointer hover:scale-110 transition" /></Link>
-                    <Link href="/profile"><User size={32} className="text-white cursor-pointer hover:scale-110 transition" /></Link>
+                    <Link href={user ? `/profile/@${user.username}` : '/profile'}><User size={32} className="text-white cursor-pointer hover:scale-110 transition" /></Link>
                 </div>
 
                 {/* Main Content Area */}
@@ -58,7 +58,7 @@ export default function AppLayout({ children }) {
                     <Bell size={24} />
                     <span className="text-[10px] mt-1">Inbox</span>
                 </Link>
-                <Link href="/profile" className="text-gray-400 flex flex-col items-center">
+                <Link href={user ? `/profile/@${user.username}` : '/profile'} className="text-gray-400 flex flex-col items-center">
                     <User size={24} />
                     <span className="text-[10px] mt-1">Profile</span>
                 </Link>

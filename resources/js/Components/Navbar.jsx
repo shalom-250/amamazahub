@@ -57,7 +57,7 @@ export default function Navbar({ user }) {
 
                             {showDropdown && (
                                 <div className="absolute right-0 mt-3 w-56 bg-gray-950 border border-gray-800 rounded-2xl shadow-2xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
-                                    <Link href="/profile" className="flex items-center space-x-3 px-4 py-3 hover:bg-white/5 transition">
+                                    <Link href={`/profile/@${user.username}`} className="flex items-center space-x-3 px-4 py-3 hover:bg-white/5 transition">
                                         <User size={18} /> <span className="text-sm font-bold">View profile</span>
                                     </Link>
                                     <Link href="/wallet" className="flex items-center space-x-3 px-4 py-3 hover:bg-white/5 transition">

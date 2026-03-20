@@ -1,15 +1,15 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\FollowController;
+use App\Http\Controllers\ExploreController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome');
-});
+Route::get('/', [App\Http\Controllers\VideoController::class, 'index']);
 
 // Auth Routes
 Route::get('/signup', [AuthController::class, 'showSignup']);
@@ -19,13 +19,14 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
 
 // Profile & Pages
-Route::get('/explore', function () {
-    return Inertia::render('Explore');
-});
+Route::get('/explore', [App\Http\Controllers\ExploreController::class, 'index']);
 
 Route::get('/upload', function () {
     return Inertia::render('Upload');
-});
+})->middleware('auth');
+
+Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'index'])->middleware('auth');
+Route::get('/profile/@{username}', [App\Http\Controllers\ProfileController::class, 'show']);
 
 Route::get('/messages', function () {
     return Inertia::render('Messages');
@@ -145,4 +146,15 @@ Route::middleware('auth')->group(function () {
     // Social Features
     Route::post('/users/{user}/follow', [FollowController::class, 'toggle']);
     Route::get('/api/suggested', [FollowController::class, 'suggested']);
+    Route::get('/api/following', [FollowController::class, 'following']);
+    
+    // Messaging
+    Route::get('/messages', [MessageController::class, 'index']);
+    Route::get('/api/messages/{user}', [MessageController::class, 'getMessages']);
+    Route::post('/api/messages/{user}', [MessageController::class, 'store']);
+    
+    // Video Interactions
+    Route::post('/videos/{video}/like', [App\Http\Controllers\LikeController::class, 'toggle']);
+    Route::post('/videos/{video}/comment', [App\Http\Controllers\CommentController::class, 'store']);
+    Route::get('/videos/{video}/comments', [App\Http\Controllers\CommentController::class, 'index']);
 });

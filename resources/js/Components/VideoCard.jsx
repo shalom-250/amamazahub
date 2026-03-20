@@ -6,8 +6,66 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function VideoCard({ video }) {
     const videoRef = useRef(null);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [isLiked, setIsLiked] = useState(false);
-    const [isFollowed, setIsFollowed] = useState(false);
+    const [isLiked, setIsLiked] = useState(video.likes_exists || false);
+    const [likesCount, setLikesCount] = useState(video.likes_count || 0);
+    const [isFollowed, setIsFollowed] = useState(video.user.is_followed || false);
+
+    const toggleFollow = async () => {
+        try {
+            const response = await axios.post(`/users/${video.user.id}/follow`);
+            setIsFollowed(response.data.following);
+        } catch (error) {
+            console.error('Error toggling follow', error);
+        }
+    };
+    const [showComments, setShowComments] = useState(false);
+    const [comments, setComments] = useState([]);
+    const [newComment, setNewComment] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const fetchComments = async () => {
+        try {
+            const response = await axios.get(`/videos/${video.id}/comments`);
+            setComments(response.data.data);
+        } catch (error) {
+            console.error('Error fetching comments', error);
+        }
+    };
+
+    const handlePostComment = async () => {
+        if (!newComment.trim() || isSubmitting) return;
+        setIsSubmitting(true);
+        try {
+            const response = await axios.post(`/videos/${video.id}/comment`, {
+                comment_text: newComment
+            });
+            setComments([response.data.comment, ...comments]);
+            setNewComment('');
+            // Optional: update video.comments_count locally if needed, 
+            // but the modal header uses video.comments_count from props. 
+            // I'll leave it for now or add a local state for comment count if needed.
+        } catch (error) {
+            console.error('Error posting comment', error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    useEffect(() => {
+        if (showComments) {
+            fetchComments();
+        }
+    }, [showComments]);
+
+    const toggleLike = async () => {
+        try {
+            const response = await axios.post(`/videos/${video.id}/like`);
+            setIsLiked(response.data.liked);
+            setLikesCount(response.data.likes_count);
+        } catch (error) {
+            console.error('Error toggling like', error);
+        }
+    };
     const [progress, setProgress] = useState(0);
     const [lastTap, setLastTap] = useState(0);
     const [showHeart, setShowHeart] = useState(null); // { x, y, id }
@@ -36,7 +94,10 @@ export default function VideoCard({ video }) {
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
-        setIsLiked(true);
+        if (!isLiked) {
+            toggleLike();
+        }
+        
         const id = Math.random();
         setShowHeart({ x, y, id });
 
@@ -82,7 +143,7 @@ export default function VideoCard({ video }) {
                     loop
                     playsInline
                     className="w-full h-full object-cover cursor-pointer"
-                    src={video.url}
+                    src={video.video_url}
                 />
 
                 {/* Double Tap Heart Animation */}
@@ -115,31 +176,31 @@ export default function VideoCard({ video }) {
 
                 {/* Bottom Left Info */}
                 <div className="absolute bottom-4 left-4 right-16 space-y-3 z-10 text-white drop-shadow-lg">
-                    <Link href="/video-detail" className="block group/text">
+                    <Link href={`/profile/@${video.user.username}`} className="block group/text">
                         <motion.h3
                             initial={{ opacity: 0, x: -20 }}
                             whileInView={{ opacity: 1, x: 0 }}
-                            className="font-bold text-lg hover:underline flex items-center"
+                            className="font-black italic text-lg hover:underline flex items-center tracking-tighter"
                         >
-                            @{video.user}
-                            {video.user === 'amazamahub_official' && (
+                            @{video.user.username}
+                            {video.user.username === 'amazamahub_official' && (
                                 <CheckCircle2 size={16} className="ml-1 text-cyan-400 fill-cyan-400/20" />
                             )}
                         </motion.h3>
-                        <p className="text-sm line-clamp-2 pr-4">{video.caption}</p>
+                        <p className="text-sm font-medium line-clamp-2 pr-4">{video.caption}</p>
                     </Link>
-                    <div className="flex items-center space-x-2 text-sm font-semibold truncate group/music">
-                        <Music2 size={14} className="music-disc" />
-                        <span className="hover:underline cursor-pointer">{video.music}</span>
+                    <div className="flex items-center space-x-2 text-xs font-black italic tracking-tight truncate group/music">
+                        <Music2 size={14} className="music-disc text-primary" />
+                        <span className="hover:underline cursor-pointer">{video.music_name}</span>
                     </div>
                 </div>
 
                 {/* Right Sidebar Controls */}
-                <div className="absolute bottom-6 right-2 flex flex-col items-center space-y-5 z-10">
+                <div className="absolute bottom-8 right-2 flex flex-col items-center space-y-6 z-10">
                     {/* User Profile Info */}
                     <div className="relative mb-2">
-                        <Link href="/profile" className="w-12 h-12 rounded-full border-2 border-white overflow-hidden bg-primary/20 flex items-center justify-center font-bold text-white shadow-xl hover:scale-105 transition block">
-                            {video.user?.[0]?.toUpperCase() || 'U'}
+                        <Link href={`/profile/@${video.user.username}`} className="w-12 h-12 rounded-full border-2 border-white overflow-hidden bg-gray-900 shadow-2xl hover:scale-105 transition-transform block">
+                            <img src={video.user.avatar || `https://ui-avatars.com/api/?name=${video.user.username}&background=random`} className="w-full h-full object-cover" />
                         </Link>
                         <AnimatePresence>
                             {!isFollowed && (
@@ -147,39 +208,46 @@ export default function VideoCard({ video }) {
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
                                     exit={{ scale: 0 }}
-                                    onClick={() => setIsFollowed(true)}
-                                    className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-primary text-black rounded-full p-1 hover:scale-110 transition shadow-lg"
+                                    onClick={toggleFollow}
+                                    className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-primary text-black rounded-full p-1.5 hover:scale-110 shadow-xl border-2 border-black"
                                 >
-                                    <Plus size={12} strokeWidth={4} />
+                                    <Plus size={10} strokeWidth={4} />
                                 </motion.button>
                             )}
                         </AnimatePresence>
                     </div>
 
                     {/* Like Button */}
-                    <div className="flex flex-col items-center group cursor-pointer" onClick={() => setIsLiked(!isLiked)}>
+                    <div className="flex flex-col items-center group cursor-pointer" onClick={toggleLike}>
                         <motion.div
-                            animate={isLiked ? { scale: [1, 1.3, 1] } : {}}
-                            className={`w-12 h-12 bg-gray-800/40 backdrop-blur-md rounded-full flex items-center justify-center transition ${isLiked ? 'text-primary' : 'text-white'}`}
+                            animate={isLiked ? { scale: [1, 1.4, 1] } : {}}
+                            className={`w-12 h-12 bg-gray-900/60 backdrop-blur-xl rounded-full flex items-center justify-center transition shadow-2xl ${isLiked ? 'text-primary' : 'text-white'}`}
                         >
-                            <Heart size={28} fill={isLiked ? 'currentColor' : 'none'} />
+                            <Heart size={26} fill={isLiked ? 'currentColor' : 'none'} strokeWidth={isLiked ? 0 : 2} />
                         </motion.div>
-                        <span className="text-xs font-bold mt-1 shadow-black text-white">{video.likes}</span>
+                        <span className="text-[10px] font-black mt-1 shadow-black text-white uppercase tracking-tighter">
+                            {Intl.NumberFormat('en-US', { notation: 'compact' }).format(likesCount)}
+                        </span>
                     </div>
 
-                    {/* Other buttons... */}
-                    <div className="flex flex-col items-center group cursor-pointer">
-                        <div className="w-12 h-12 bg-gray-800/40 backdrop-blur-md rounded-full flex items-center justify-center text-white">
-                            <MessageCircle size={28} />
+                    {/* Comment Button */}
+                    <div className="flex flex-col items-center group cursor-pointer" onClick={() => setShowComments(true)}>
+                        <div className="w-12 h-12 bg-gray-900/60 backdrop-blur-xl rounded-full flex items-center justify-center text-white shadow-2xl transition group-hover:bg-gray-800/80">
+                            <MessageCircle size={26} />
                         </div>
-                        <span className="text-xs font-bold mt-1 shadow-black text-white">{video.comments}</span>
+                        <span className="text-[10px] font-black mt-1 shadow-black text-white uppercase tracking-tighter">
+                             {Intl.NumberFormat('en-US', { notation: 'compact' }).format(video.comments_count)}
+                        </span>
                     </div>
 
+                    {/* Bookmark Button */}
                     <div className="flex flex-col items-center group cursor-pointer">
-                        <div className="w-12 h-12 bg-gray-800/40 backdrop-blur-md rounded-full flex items-center justify-center text-white">
-                            <Bookmark size={28} />
+                        <div className="w-12 h-12 bg-gray-900/60 backdrop-blur-xl rounded-full flex items-center justify-center text-white shadow-2xl transition group-hover:bg-gray-800/80">
+                            <Bookmark size={26} />
                         </div>
-                        <span className="text-xs font-bold mt-1 shadow-black text-white">{video.saves}</span>
+                        <span className="text-[10px] font-black mt-1 shadow-black text-white uppercase tracking-tighter">
+                            {Math.floor(video.likes_count / 15)}
+                        </span>
                     </div>
 
                     <div className="flex flex-col items-center group cursor-pointer">
@@ -206,6 +274,70 @@ export default function VideoCard({ video }) {
                         style={{ width: `${progress}%` }}
                     />
                 </div>
+
+                {/* Real-time Comment Modal */}
+                <AnimatePresence>
+                    {showComments && (
+                        <div className="absolute inset-0 z-50 flex flex-col justify-end bg-black/40 backdrop-blur-sm" onClick={() => setShowComments(false)}>
+                            <motion.div 
+                                initial={{ y: '100%' }}
+                                animate={{ y: 0 }}
+                                exit={{ y: '100%' }}
+                                onClick={(e) => e.stopPropagation()}
+                                className="bg-gray-950 w-full h-[70vh] rounded-t-[40px] flex flex-col p-6 shadow-2xl border-t border-white/5"
+                            >
+                                <div className="flex items-center justify-between mb-6 px-2">
+                                    <h3 className="text-sm font-black italic uppercase tracking-widest text-gray-400">
+                                        {Intl.NumberFormat('en-US', { notation: 'compact' }).format(video.comments_count)} Comments
+                                    </h3>
+                                    <button onClick={() => setShowComments(false)} className="p-2 bg-gray-900 rounded-full text-gray-400 hover:text-white transition">
+                                        <Plus className="rotate-45" size={24} />
+                                    </button>
+                                </div>
+
+                                <div className="flex-1 overflow-y-auto space-y-6 px-2 custom-scrollbar pb-24">
+                                     {comments.length === 0 ? (
+                                         <div className="flex flex-col items-center justify-center py-12 text-gray-700">
+                                             <MessageCircle size={48} className="mb-4 opacity-20" />
+                                             <p className="font-black italic uppercase tracking-widest text-xs">No comments yet</p>
+                                             <p className="text-[10px] mt-1">Be the first to say something!</p>
+                                         </div>
+                                     ) : (
+                                         comments.map((c, i) => (
+                                             <div key={i} className="flex space-x-4">
+                                                 <img src={c.user.avatar || `https://ui-avatars.com/api/?name=${c.user.username}`} className="w-10 h-10 rounded-full border border-gray-800" />
+                                                 <div className="flex-1 space-y-1">
+                                                     <p className="text-[10px] font-black text-gray-400 italic">@{c.user.username} <span className="font-medium text-gray-600 ml-2">Just now</span></p>
+                                                     <p className="text-sm font-medium text-gray-100">{c.comment_text}</p>
+                                                 </div>
+                                             </div>
+                                         ))
+                                     )}
+                                </div>
+
+                                {/* Comment Input */}
+                                <div className="absolute bottom-0 left-0 right-0 p-6 bg-gray-950 border-t border-white/5 flex items-center space-x-4">
+                                     <div className="flex-1 bg-gray-900 rounded-2xl flex items-center px-4 border border-white/5 focus-within:border-primary/50 transition">
+                                         <input 
+                                             value={newComment}
+                                             onChange={(e) => setNewComment(e.target.value)}
+                                             onKeyDown={(e) => e.key === 'Enter' && handlePostComment()}
+                                             placeholder="Add a real comment..." 
+                                             className="bg-transparent border-none focus:ring-0 text-sm py-4 w-full"
+                                         />
+                                     </div>
+                                     <button 
+                                         onClick={handlePostComment}
+                                         disabled={!newComment.trim() || isSubmitting}
+                                         className="bg-primary text-black font-black italic px-6 py-4 rounded-2xl hover:scale-105 transition disabled:opacity-50"
+                                     >
+                                         {isSubmitting ? '...' : 'Post'}
+                                     </button>
+                                </div>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>
             </div>
         </div>
     );
