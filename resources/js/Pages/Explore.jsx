@@ -1,12 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import AppLayout from '../Components/AppLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { Search, TrendingUp, Music2, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Explore({ videos, currentCategory, categories }) {
+    const [searchTerm, setSearchTerm] = useState('');
+
     const handleCategoryChange = (cat) => {
         router.get('/explore', { category: cat }, { preserveState: true });
+    };
+
+    const handleSearch = (e) => {
+        if (e.key === 'Enter') {
+            router.get('/explore', { search: searchTerm }, { preserveState: true });
+        }
     };
 
     return (
@@ -18,6 +26,9 @@ export default function Explore({ videos, currentCategory, categories }) {
                     <Search className="text-gray-500" size={24} />
                     <input
                         type="text"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onKeyDown={handleSearch}
                         placeholder="Search for amazing creators and videos..."
                         className="bg-transparent border-none focus:ring-0 w-full text-lg font-medium placeholder-gray-600"
                     />
@@ -55,7 +66,7 @@ export default function Explore({ videos, currentCategory, categories }) {
                                 transition={{ delay: i * 0.05 }}
                                 className="aspect-[9/16] bg-gray-900 rounded-[32px] overflow-hidden relative group cursor-pointer transition transform hover:scale-[1.02] active:scale-95 shadow-lg border border-gray-800"
                             >
-                                <Link href="/video-detail">
+                                <Link href={`/v/${video.id}`}>
                                     <img 
                                         src={video.thumbnail_url} 
                                         className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-700 group-hover:scale-110" 
@@ -73,7 +84,7 @@ export default function Explore({ videos, currentCategory, categories }) {
                                                 </div>
                                                 <div className="flex items-center space-x-1 text-[10px] font-black text-white bg-black/40 px-2 py-0.5 rounded-full">
                                                     <Play size={10} fill="currentColor" />
-                                                    <span>{Math.floor(video.likes_count / 100)}k</span>
+                                                    <span>{Intl.NumberFormat('en-US', { notation: 'compact' }).format(video.likes_count)}</span>
                                                 </div>
                                             </div>
                                         </div>

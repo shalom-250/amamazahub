@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Search, Plus, MessageSquare, Bell, User, LogIn, LogOut, Settings, LayoutDashboard, Wallet, Radio, HelpCircle } from 'lucide-react';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 
 export default function Navbar({ user }) {
+    const { auth } = usePage().props;
     const [showDropdown, setShowDropdown] = useState(false);
 
     return (
@@ -41,7 +42,11 @@ export default function Navbar({ user }) {
                     <div className="flex items-center space-x-6 px-2">
                         <Link href="/messages" className="text-white hover:text-primary transition relative">
                             <MessageSquare size={24} />
-                            <span className="absolute -top-1 -right-1 bg-primary text-black text-[10px] font-black rounded-full w-4 h-4 flex items-center justify-center">2</span>
+                            {auth.unread_messages_count > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-primary text-black text-[10px] font-black rounded-full w-4 h-4 flex items-center justify-center">
+                                    {auth.unread_messages_count}
+                                </span>
+                            )}
                         </Link>
                         <Link href="/notifications" className="text-white hover:text-primary transition">
                             <Bell size={24} />

@@ -12,14 +12,32 @@ class ExploreController extends Controller
     public function index(Request $request)
     {
         $category = $request->query('category', 'Trending');
+        $search = $request->query('search');
         
-        $videos = Video::with('user')
-            ->withExists(['likes' => function ($query) {
-                $query->where('user_id', Auth::id());
+        $query = Video::with('user')
+            ->withCount(['likes', 'comments', 'reposts', 'shares', 'bookmarks'])
+            ->withExists(['likes' => function ($q) {
+                $q->where('user_id', Auth::id());
             }])
-            ->where('category', $category)
-            ->latest()
-            ->paginate(12);
+            ->withExists(['reposts' => function ($q) {
+                $q->where('user_id', Auth::id());
+            }])
+            ->withExists(['bookmarks' => function ($q) {
+                $q->where('user_id', Auth::id());
+            }]);
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('caption', 'like', "%{$search}%")
+                  ->orWhereHas('user', function($u) use ($search) {
+                      $u->where('username', 'like', "%{$search}%");
+                  });
+            });
+        } else {
+            $query->where('category', $category);
+        }
+
+        $videos = $query->latest()->paginate(12);
 
         $categories = ['Trending', 'Comedy', 'Education', 'Gaming', 'Music', 'Vlogs'];
 

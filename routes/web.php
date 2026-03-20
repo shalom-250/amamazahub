@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', [App\Http\Controllers\VideoController::class, 'index']);
+Route::get('/v/{video}', [App\Http\Controllers\VideoController::class, 'show']);
 
 // Auth Routes
 Route::get('/signup', [AuthController::class, 'showSignup']);

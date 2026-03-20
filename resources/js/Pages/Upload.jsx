@@ -5,9 +5,11 @@ import { Upload as UploadIcon, Video, Music, CheckCircle2, Loader2 } from 'lucid
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Upload() {
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const categories = ['Trending', 'Comedy', 'Education', 'Gaming', 'Music', 'Vlogs'];
+    const { data, setData, post, processing, errors, reset, progress } = useForm({
         video: null,
         caption: '',
+        category: 'Trending',
     });
 
     const [preview, setPreview] = useState(null);

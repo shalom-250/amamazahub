@@ -15,6 +15,7 @@ export default function VideoCard({ video }) {
     const [isBookmarked, setIsBookmarked] = useState(video.bookmarks_exists || false);
     const [bookmarksCount, setBookmarksCount] = useState(video.bookmarks_count || 0);
     const [sharesCount, setSharesCount] = useState(video.shares_count || 0);
+    const [commentsCount, setCommentsCount] = useState(video.comments_count || 0);
 
     const toggleFollow = async () => {
         try {
@@ -46,11 +47,21 @@ export default function VideoCard({ video }) {
     };
 
     const handleShare = async () => {
+        const shareData = {
+            title: 'AmazamaHub Video',
+            text: video.caption,
+            url: window.location.origin + `/v/${video.id}`,
+        };
+
         try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+            } else {
+                await navigator.clipboard.writeText(shareData.url);
+                alert('Link copied to clipboard!');
+            }
             const response = await axios.post(`/videos/${video.id}/share`);
             setSharesCount(response.data.shares_count);
-            // Show a "Copy Link" or "Shared" success message if possible
-            alert('Link copied and shared!');
         } catch (error) {
             console.error('Error sharing', error);
         }
@@ -77,10 +88,8 @@ export default function VideoCard({ video }) {
                 comment_text: newComment
             });
             setComments([response.data.comment, ...comments]);
+            setCommentsCount(response.data.comments_count);
             setNewComment('');
-            // Optional: update video.comments_count locally if needed, 
-            // but the modal header uses video.comments_count from props. 
-            // I'll leave it for now or add a local state for comment count if needed.
         } catch (error) {
             console.error('Error posting comment', error);
         } finally {
@@ -273,7 +282,7 @@ export default function VideoCard({ video }) {
                             <MessageCircle size={26} />
                         </div>
                         <span className="text-[10px] font-black mt-1 shadow-black text-white uppercase tracking-tighter">
-                             {Intl.NumberFormat('en-US', { notation: 'compact' }).format(video.comments_count)}
+                             {Intl.NumberFormat('en-US', { notation: 'compact' }).format(commentsCount)}
                         </span>
                     </div>
 
@@ -344,7 +353,7 @@ export default function VideoCard({ video }) {
                             >
                                 <div className="flex items-center justify-between mb-6 px-2">
                                     <h3 className="text-sm font-black italic uppercase tracking-widest text-gray-400">
-                                        {Intl.NumberFormat('en-US', { notation: 'compact' }).format(video.comments_count)} Comments
+                                        {Intl.NumberFormat('en-US', { notation: 'compact' }).format(commentsCount)} Comments
                                     </h3>
                                     <button onClick={() => setShowComments(false)} className="p-2 bg-gray-900 rounded-full text-gray-400 hover:text-white transition">
                                         <Plus className="rotate-45" size={24} />
