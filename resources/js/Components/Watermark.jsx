@@ -1,31 +1,58 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Watermark({ size = 'sm', className = '' }) {
     const isLarge = size === 'lg';
 
+    const positions = [
+        'bottom-6 right-6',
+        'top-6 left-6',
+        'top-6 right-6',
+        'bottom-6 left-6'
+    ];
+
+    const [corner, setCorner] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCorner(prev => (prev + 1) % 4);
+        }, 7000);
+        return () => clearInterval(interval);
+    }, []);
+
     return (
-        <motion.div
-            initial={{ opacity: 0.3, scale: 0.95 }}
-            animate={{
-                opacity: [0.2, 0.4, 0.2],
-                scale: [0.95, 1, 0.95],
-            }}
-            transition={{
-                duration: 5,
-                repeat: Infinity,
-                ease: "easeInOut"
-            }}
-            className={`absolute bottom-4 right-4 z-30 pointer-events-none select-none flex items-center space-x-1.5 bg-black/10 backdrop-blur-[1px] px-2 py-1 rounded-lg border border-white/5 ${className}`}
-        >
-            <div className={`${isLarge ? 'w-5 h-5' : 'w-3.5 h-3.5'} rounded-md overflow-hidden flex-shrink-0 opacity-40`}>
-                <img src="/images/logo.png" className="w-full h-full object-cover" alt="logo" />
-            </div>
-            <div className="flex flex-col">
-                <span className={`${isLarge ? 'text-xs' : 'text-[7px]'} font-extralight italic tracking-[0.2em] text-primary uppercase leading-none opacity-50`}>
-                    AmazamaHub
+        <AnimatePresence mode="wait">
+            <motion.div
+                key={corner}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{
+                    opacity: 0.9,
+                    scale: 1,
+                    y: [0, -6, 0], // floating
+                }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{
+                    opacity: { duration: 1 },
+                    scale: { duration: 1 },
+                    y: {
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                    }
+                }}
+                className={`absolute z-30 pointer-events-none select-none ${positions[corner]} ${className}`}
+            >
+                <span
+                    className={`
+                        ${isLarge ? 'text-sm' : 'text-xs'} 
+                        font-light tracking-[0.3em] uppercase
+                        text-[#ed7014]
+                        drop-shadow-[0_0_6px_rgba(237,112,20,0.6)]
+                    `}
+                >
+                    AMAZAMAHUB
                 </span>
-            </div>
-        </motion.div>
+            </motion.div>
+        </AnimatePresence>
     );
 }

@@ -54,6 +54,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/settings', function () {
         return Inertia::render('Settings');
     });
+    Route::post('/settings/update', [App\Http\Controllers\SettingsController::class, 'update'])->name('settings.update');
 
     Route::get('/creator-tools', function () {
         return Inertia::render('CreatorTools');

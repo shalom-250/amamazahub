@@ -68,14 +68,14 @@ export default function Sidebar({ user }) {
             <div className="border-t border-gray-800 my-4 pt-4 px-2 hidden lg:block overflow-hidden">
                 <p className="text-gray-500 text-sm font-bold uppercase tracking-wider mb-4 px-1">Suggested accounts</p>
                 <div className="space-y-3">
-                    {[
-                        { name: 'TikTok Star', username: 'tiktok_star', avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=100' },
-                        { name: 'Creative Mind', username: 'creative', avatar: 'https://images.pexels.com/photos/1671325/pexels-photo-1671325.jpeg?auto=compress&cs=tinysrgb&w=100' },
-                        { name: 'Viral King', username: 'v_king', avatar: 'https://images.pexels.com/photos/3408744/pexels-photo-3408744.jpeg?auto=compress&cs=tinysrgb&w=100' },
-                    ].map((acc, i) => (
-                        <div key={i} className="flex items-center space-x-3 p-2 hover:bg-gray-900/50 rounded-md cursor-pointer transition group">
+                    {(props.suggested_users || []).map((acc) => (
+                        <Link
+                            key={acc.id}
+                            href={`/profile/@${acc.username}`}
+                            className="flex items-center space-x-3 p-2 hover:bg-gray-900/50 rounded-md cursor-pointer transition group"
+                        >
                             <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-800 flex-shrink-0 border border-gray-800">
-                                <img src={acc.avatar} className="w-full h-full object-cover" alt={acc.username} />
+                                <img src={acc.avatar || `https://ui-avatars.com/api/?name=${acc.username}`} className="w-full h-full object-cover" alt={acc.username} />
                             </div>
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center space-x-1">
@@ -84,9 +84,9 @@ export default function Sidebar({ user }) {
                                 </div>
                                 <p className="text-[10px] text-gray-500 truncate font-semibold">{acc.name}</p>
                             </div>
-                        </div>
+                        </Link>
                     ))}
-                    <button className="text-primary text-xs font-black px-2 mt-2 hover:underline">See all</button>
+                    <Link href="/following" className="text-primary text-xs font-black px-2 mt-2 hover:underline block">See all</Link>
                 </div>
             </div>
 

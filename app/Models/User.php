@@ -24,6 +24,10 @@ class User extends Authenticatable
         'password',
         'avatar',
         'bio',
+        'language',
+        'balance',
+        'dark_mode',
+        'push_notifications',
     ];
 
     /**

@@ -29,12 +29,22 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+        
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
-                'unread_messages_count' => $request->user() ? \App\Models\Message::where('receiver_id', $request->user()->id)->where('is_read', false)->count() : 0,
+                'user' => $user,
+                'unread_messages_count' => $user ? \App\Models\Message::where('receiver_id', $user->id)->where('is_read', false)->count() : 0,
             ],
+            'suggested_users' => $user 
+                ? \App\Models\User::where('id', '!=', $user->id)
+                    ->whereDoesntHave('followers', function ($query) use ($user) {
+                        $query->where('follower_id', $user->id);
+                    })
+                    ->limit(5)
+                    ->get()
+                : \App\Models\User::limit(5)->get(),
         ];
     }
 }

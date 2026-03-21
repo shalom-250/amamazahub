@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import { Link, usePage } from '@inertiajs/react';
@@ -8,8 +8,18 @@ export default function AppLayout({ children }) {
     const { props } = usePage();
     const user = props.auth?.user;
 
+    useEffect(() => {
+        // Handle Theme Preference
+        const isDarkMode = user?.dark_mode ?? true;
+        if (isDarkMode) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    }, [user?.dark_mode]);
+
     return (
-        <div className="bg-black text-white h-screen flex flex-col overflow-hidden">
+        <div className="bg-white dark:bg-black text-black dark:text-white h-screen flex flex-col overflow-hidden transition-colors duration-500">
             <Navbar user={user} />
 
             <div className="flex flex-1 overflow-hidden max-w-[1600px] mx-auto w-full relative">
@@ -19,30 +29,30 @@ export default function AppLayout({ children }) {
                 </div>
 
                 {/* Mobile/Small Screen Mini Sidebar */}
-                <div className="hidden md:flex lg:hidden w-20 flex-col items-center py-4 space-y-8 h-full bg-black border-r border-gray-900">
+                <div className="hidden md:flex lg:hidden w-20 flex-col items-center py-4 space-y-8 h-full bg-white dark:bg-black border-r border-gray-100 dark:border-gray-900 transition-colors">
                     <Link href="/"><Home size={32} className="text-primary cursor-pointer hover:scale-110 transition" /></Link>
-                    <Link href="/explore"><Compass size={32} className="text-white cursor-pointer hover:scale-110 transition" /></Link>
-                    <Link href="/upload"><Plus size={32} className="text-white cursor-pointer hover:scale-110 transition" /></Link>
+                    <Link href="/explore"><Compass size={32} className="text-gray-900 dark:text-white cursor-pointer hover:scale-110 transition" /></Link>
+                    <Link href="/upload"><Plus size={32} className="text-gray-900 dark:text-white cursor-pointer hover:scale-110 transition" /></Link>
                     <Link href="/messages" className="relative group">
-                        <MessageSquare size={32} className="text-white cursor-pointer hover:scale-110 transition" />
+                        <MessageSquare size={32} className="text-gray-900 dark:text-white cursor-pointer hover:scale-110 transition" />
                         {props.auth.unread_messages_count > 0 && (
-                            <span className="absolute -top-1 -right-1 bg-primary text-black text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-black border-2 border-black">
+                            <span className="absolute -top-1 -right-1 bg-primary text-black text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-black border-2 border-white dark:border-black">
                                 {props.auth.unread_messages_count}
                             </span>
                         )}
                     </Link>
-                    <Link href={user ? `/profile/@${user.username}` : '/profile'}><User size={32} className="text-white cursor-pointer hover:scale-110 transition" /></Link>
+                    <Link href={user ? `/profile/@${user.username}` : '/profile'}><User size={32} className="text-gray-900 dark:text-white cursor-pointer hover:scale-110 transition" /></Link>
                 </div>
 
                 {/* Main Content Area */}
-                <main className="flex-1 relative flex flex-col min-w-0 overflow-y-auto custom-scrollbar">
+                <main className="flex-1 relative flex flex-col min-w-0 overflow-y-auto custom-scrollbar bg-gray-50/30 dark:bg-black transition-colors">
                     {children}
                 </main>
             </div>
 
             {/* Mobile Bottom Navigation (Visible on small screens only) */}
-            <div className="md:hidden border-t border-gray-800 h-16 bg-black flex justify-around items-center px-4 fixed bottom-0 left-0 right-0 z-50">
-                <Link href="/" className="text-white flex flex-col items-center">
+            <div className="md:hidden border-t border-gray-100 dark:border-gray-800 h-16 bg-white dark:bg-black flex justify-around items-center px-4 fixed bottom-0 left-0 right-0 z-50 transition-colors">
+                <Link href="/" className="text-gray-900 dark:text-white flex flex-col items-center">
                     <Home size={24} />
                     <span className="text-[10px] mt-1 font-bold">Home</span>
                 </Link>
@@ -55,7 +65,7 @@ export default function AppLayout({ children }) {
                     <span className="text-[10px] mt-1">Shop</span>
                 </Link>
                 <Link href="/story" className="relative group mx-2">
-                    <div className="bg-white rounded-lg px-3 py-1.5 flex items-center justify-center relative z-10">
+                    <div className="bg-gray-100 dark:bg-white rounded-lg px-3 py-1.5 flex items-center justify-center relative z-10">
                         <Plus size={20} className="text-black" />
                     </div>
                     <div className="absolute inset-0 bg-primary -left-1 rounded-lg"></div>
@@ -64,7 +74,7 @@ export default function AppLayout({ children }) {
                 <Link href="/notifications" className="text-gray-400 flex flex-col items-center relative">
                     <Bell size={24} />
                     {props.auth.unread_messages_count > 0 && (
-                        <span className="absolute -top-1 right-2 bg-primary text-black text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-black border border-black">
+                        <span className="absolute -top-1 right-2 bg-primary text-black text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-black border border-white dark:border-black">
                             {props.auth.unread_messages_count}
                         </span>
                     )}
