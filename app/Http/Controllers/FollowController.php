@@ -3,28 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Video;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class FollowController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
         
-        $following = $user ? $user->following()->limit(10)->get() : [];
+        $following = $user ? $user->following()->get() : [];
         
-        $suggested = User::where('id', '!=', Auth::id())
+        $query = User::where('id', '!=', Auth::id())
             ->whereDoesntHave('followers', function ($query) {
                 $query->where('follower_id', Auth::id());
-            })
-            ->limit(10)
-            ->get();
+            });
+
+        if (!$request->query('all')) {
+            $query->limit(20);
+        }
+
+        $suggested = $query->get();
 
         return Inertia::render('Following', [
             'followingUsers' => $following,
             'suggestedUsers' => $suggested,
+            'showingAll' => !!$request->query('all'),
         ]);
     }
 
@@ -67,7 +73,6 @@ class FollowController extends Controller
             ->whereDoesntHave('followers', function ($query) use ($userId) {
                 $query->where('follower_id', $userId);
             })
-            ->limit(5)
             ->get();
 
         return response()->json($suggested);
@@ -78,5 +83,31 @@ class FollowController extends Controller
         $user = Auth::user();
         $following = $user ? $user->following()->get() : [];
         return response()->json($following);
+    }
+
+    public function friendsPage()
+    {
+        $user = Auth::user();
+        if (!$user) return Inertia::render('Friends', ['friends' => [], 'videos' => []]);
+
+        // Get mutual friends
+        $friends = $user->friends()->get();
+
+        // Get videos from friends
+        $friendIds = $friends->pluck('id');
+        $videos = Video::whereIn('user_id', $friendIds)
+            ->with(['user', 'likes', 'comments'])
+            ->withCount(['likes', 'comments'])
+            ->latest()
+            ->get()
+            ->map(function($video) use ($user) {
+                $video->likes_exists = $video->likes->where('user_id', $user->id)->count() > 0;
+                return $video;
+            });
+
+        return Inertia::render('Friends', [
+            'friends' => $friends,
+            'videos' => $videos,
+        ]);
     }
 }

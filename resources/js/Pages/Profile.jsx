@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AppLayout from '../Components/AppLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import { Edit2, Grid, Lock, Heart, Share2, BadgeCheck, Plus, Check } from 'lucide-react';
+import { Edit2, Grid, Lock, Heart, Share2, BadgeCheck, Plus, Check, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 

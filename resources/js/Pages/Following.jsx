@@ -4,12 +4,19 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import { CheckCircle2, UserPlus, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-export default function Following({ followingUsers, suggestedUsers, auth }) {
+export default function Following({ followingUsers, suggestedUsers, showingAll, auth }) {
     const { post, processing } = useForm();
 
     const handleFollow = (userId) => {
         post(`/users/${userId}/follow`, {
             preserveScroll: true,
+        });
+    };
+
+    const seeAll = () => {
+        router.get('/following', { all: 1 }, {
+            preserveState: true,
+            preserveScroll: true
         });
     };
 
@@ -73,7 +80,12 @@ export default function Following({ followingUsers, suggestedUsers, auth }) {
                             <UserPlus className="text-primary" size={28} />
                             <h2 className="text-2xl font-black italic text-white/90">Suggested for you</h2>
                         </div>
-                        <button className="text-primary text-sm font-black hover:underline">See all</button>
+                        {!showingAll && (
+                            <button onClick={seeAll} className="text-primary text-sm font-black hover:underline uppercase tracking-widest">See all suggestions</button>
+                        )}
+                        {showingAll && (
+                            <Link href="/following" preserveScroll className="text-gray-500 text-sm font-black hover:underline uppercase tracking-widest">Show Less</Link>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">

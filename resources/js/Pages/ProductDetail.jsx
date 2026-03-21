@@ -1,11 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import AppLayout from '../Components/AppLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { ShoppingCart, Heart, Share2, Truck, ShieldCheck, Star, ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function ProductDetail({ product }) {
     if (!product) return null;
+
+    const [selectedColor, setSelectedColor] = useState(product.colors?.[0] || null);
+
+    const addToCart = () => {
+        router.post('/shop/cart', {
+            product_id: product.id,
+            quantity: 1,
+            color: selectedColor
+        });
+    };
 
     return (
         <AppLayout>
@@ -63,18 +73,18 @@ export default function ProductDetail({ product }) {
                                 <p className="text-sm font-black italic uppercase tracking-widest text-gray-400">Color</p>
                                 <div className="flex space-x-4">
                                     {product.colors.map((c, i) => (
-                                        <button key={i} className={`px-4 py-2 rounded-xl text-xs font-bold border transition ${i === 0 ? 'bg-white text-black border-white' : 'bg-transparent text-gray-400 border-gray-800 hover:border-gray-600'}`}>{c}</button>
+                                        <button key={i} onClick={() => setSelectedColor(c)} className={`px-4 py-2 rounded-xl text-xs font-bold border transition ${selectedColor === c ? 'bg-white text-black border-white shadow-lg shadow-white/20' : 'bg-transparent text-gray-400 border-gray-800 hover:border-gray-600'}`}>{c}</button>
                                     ))}
                                 </div>
                             </div>
                         )}
 
                         <div className="flex space-x-4 pt-4">
-                            <button className="flex-1 bg-gray-900 border border-gray-800 text-white font-black italic py-4 rounded-2xl hover:bg-gray-800 transition transform active:scale-95 flex items-center justify-center space-x-2">
+                            <button onClick={addToCart} className="flex-1 bg-gray-900 border border-gray-800 text-white font-black italic py-4 rounded-2xl hover:bg-gray-800 transition transform active:scale-95 flex items-center justify-center space-x-2">
                                 <ShoppingCart size={20} />
                                 <span>Add to Cart</span>
                             </button>
-                            <button className="flex-1 bg-primary text-black font-black italic py-4 rounded-2xl hover:scale-105 transition transform active:scale-95 flex items-center justify-center space-x-2 shadow-xl shadow-primary/20">
+                            <button onClick={addToCart} className="flex-1 bg-primary text-black font-black italic py-4 rounded-2xl hover:scale-105 transition transform active:scale-95 flex items-center justify-center space-x-2 shadow-xl shadow-primary/20">
                                 <span>Buy Now</span>
                             </button>
                         </div>

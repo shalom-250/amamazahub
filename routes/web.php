@@ -69,9 +69,7 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('HelpCenter');
     });
 
-    Route::get('/friends', function () {
-        return Inertia::render('Friends');
-    });
+    Route::get('/friends', [FollowController::class, 'friendsPage']);
 
     Route::get('/search', function () {
         return Inertia::render('Search');
@@ -80,9 +78,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/shop', [\App\Http\Controllers\ShopController::class, 'index']);
     Route::get('/shop/product/{product}', [\App\Http\Controllers\ShopController::class, 'show']);
 
-    Route::get('/shop/cart', function () {
-        return Inertia::render('Cart');
-    });
+    Route::get('/shop/cart', [\App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
+    Route::post('/shop/cart', [\App\Http\Controllers\CartController::class, 'store'])->name('cart.store');
+    Route::put('/shop/cart/{cartItem}', [\App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
+    Route::delete('/shop/cart/{cartItem}', [\App\Http\Controllers\CartController::class, 'destroy'])->name('cart.destroy');
 
     Route::get('/shop/orders', function () {
         return Inertia::render('Orders');
@@ -92,17 +91,17 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('SellerCenter');
     });
 
-    Route::get('/shop/addresses', function () {
-        return Inertia::render('AddressBook');
-    });
+    Route::get('/shop/addresses', [\App\Http\Controllers\AddressController::class, 'index']);
+    Route::post('/shop/addresses', [\App\Http\Controllers\AddressController::class, 'store']);
+    Route::put('/shop/addresses/{address}/default', [\App\Http\Controllers\AddressController::class, 'set_default']);
+    Route::delete('/shop/addresses/{address}', [\App\Http\Controllers\AddressController::class, 'destroy']);
 
-    Route::get('/shop/payments', function () {
-        return Inertia::render('Payments');
-    });
+    Route::get('/shop/payments', [\App\Http\Controllers\PaymentMethodController::class, 'index']);
+    Route::post('/shop/payments', [\App\Http\Controllers\PaymentMethodController::class, 'store']);
+    Route::put('/shop/payments/{paymentMethod}/default', [\App\Http\Controllers\PaymentMethodController::class, 'set_default']);
+    Route::delete('/shop/payments/{paymentMethod}', [\App\Http\Controllers\PaymentMethodController::class, 'destroy']);
 
-    Route::get('/shop/checkout', function () {
-        return Inertia::render('Checkout');
-    });
+    Route::get('/shop/checkout', [\App\Http\Controllers\CheckoutController::class, 'index']);
 
     Route::get('/shop/promos', function () {
         return Inertia::render('Promotions');

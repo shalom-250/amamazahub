@@ -61,9 +61,29 @@ class User extends Authenticatable
         return $this->hasMany(Notification::class);
     }
 
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
+    }
+
+    public function paymentMethods()
+    {
+        return $this->hasMany(PaymentMethod::class);
+    }
+
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class);
+    }
+
     public function isFollowing(User $user)
     {
         return $this->following()->where('following_id', $user->id)->exists();
+    }
+
+    public function friends()
+    {
+        return $this->following()->whereIn('users.id', $this->followers()->pluck('follower_id'));
     }
 
     /**
