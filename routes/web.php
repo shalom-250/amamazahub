@@ -77,13 +77,8 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Search');
     });
 
-    Route::get('/shop', function () {
-        return Inertia::render('Shop');
-    });
-
-    Route::get('/shop/product/1', function () {
-        return Inertia::render('ProductDetail');
-    });
+    Route::get('/shop', [\App\Http\Controllers\ShopController::class, 'index']);
+    Route::get('/shop/product/{product}', [\App\Http\Controllers\ShopController::class, 'show']);
 
     Route::get('/shop/cart', function () {
         return Inertia::render('Cart');

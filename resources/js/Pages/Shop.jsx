@@ -4,15 +4,8 @@ import { Head, Link } from '@inertiajs/react';
 import { ShoppingBag, Search, ShoppingCart, Tag, Truck, Star, ChevronRight, Filter } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-export default function Shop() {
-    const products = [
-        { id: 1, name: 'Premium Creator Light', price: '$45.00', sales: '2.4k', image: 'https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?auto=compress&cs=tinysrgb&w=300' },
-        { id: 2, name: 'Amazama Studio Mic', price: '$120.00', sales: '842', image: 'https://images.pexels.com/photos/164829/pexels-photo-164829.jpeg?auto=compress&cs=tinysrgb&w=300' },
-        { id: 3, name: 'Vlog Tripod Pro', price: '$29.99', sales: '5.1k', image: 'https://images.pexels.com/photos/339379/pexels-photo-339379.jpeg?auto=compress&cs=tinysrgb&w=300' },
-        { id: 4, name: 'RGB Phone Case', price: '$15.00', sales: '10k+', image: 'https://images.pexels.com/photos/1474132/pexels-photo-1474132.jpeg?auto=compress&cs=tinysrgb&w=300' },
-    ];
-
-    const categories = ['All', 'Electronics', 'Fashion', 'Beauty', 'Home', 'Toys'];
+export default function Shop({ products, categories = [] }) {
+    // We get dynamic categories from DB
 
     return (
         <AppLayout>
@@ -59,8 +52,8 @@ export default function Shop() {
                 {/* Categories */}
                 <div className="flex space-x-4 mb-10 overflow-x-auto pb-2 noscrollbar">
                     {categories.map((cat, i) => (
-                        <button key={i} className={`px-6 py-2 rounded-full text-sm font-black italic border transition ${i === 0 ? 'bg-white text-black border-white' : 'bg-transparent text-gray-400 border-gray-800 hover:border-gray-600'}`}>
-                            {cat}
+                        <button key={cat.id} className={`px-6 py-2 rounded-full text-sm font-black italic border transition ${i === 0 ? 'bg-white text-black border-white' : 'bg-transparent text-gray-400 border-gray-800 hover:border-gray-600'}`}>
+                            {cat.name}
                         </button>
                     ))}
                 </div>
@@ -73,7 +66,7 @@ export default function Shop() {
                             whileHover={{ y: -8 }}
                             className="bg-gray-900/30 border border-gray-800 rounded-3xl overflow-hidden group cursor-pointer"
                         >
-                            <Link href="/shop/product/1">
+                            <Link href={`/shop/product/${prod.id}`}>
                                 <div className="aspect-square relative overflow-hidden">
                                     <img src={prod.image} className="w-full h-full object-cover group-hover:scale-110 transition duration-700" />
                                     <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded-md text-[8px] font-black text-primary">BESTSELLER</div>

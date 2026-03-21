@@ -15,6 +15,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RwandanUserSeeder::class,
             ExploreSeeder::class,
+            CategorySeeder::class,
+            ProductSeeder::class,
         ]);
     }
 }
