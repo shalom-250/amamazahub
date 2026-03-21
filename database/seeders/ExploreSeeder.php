@@ -4,6 +4,9 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\Video;
+use App\Models\Comment;
+use App\Models\Like;
+use App\Models\Follow;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -11,7 +14,7 @@ class ExploreSeeder extends Seeder
 {
     public function run(): void
     {
-        $users = [
+        $exploreUsers = [
             ['name' => 'Comedy King', 'username' => 'funny_king', 'email' => 'funny@example.com'],
             ['name' => 'Edu Tech', 'username' => 'edutech_pro', 'email' => 'edu@example.com'],
             ['name' => 'Gamer Girl', 'username' => 'gg_gamer', 'email' => 'gamer@example.com'],
@@ -19,15 +22,17 @@ class ExploreSeeder extends Seeder
             ['name' => 'Vlog Life', 'username' => 'vlog_life', 'email' => 'vlog@example.com'],
         ];
 
-        foreach ($users as $userData) {
-            $user = User::create([
+        $users = [];
+        foreach ($exploreUsers as $userData) {
+            $users[] = User::create([
                 'name' => $userData['name'],
                 'username' => $userData['username'],
                 'email' => $userData['email'],
                 'password' => Hash::make('password'),
             ]);
+        }
 
-            // Create 5 videos per user in different categories
+        foreach ($users as $user) {
             $categories = ['Trending', 'Comedy', 'Education', 'Gaming', 'Music', 'Vlogs'];
             $images = [
                  'https://images.pexels.com/photos/2161467/pexels-photo-2161467.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -39,16 +44,27 @@ class ExploreSeeder extends Seeder
             ];
 
             for ($i = 0; $i < 6; $i++) {
-                Video::create([
+                $video = Video::create([
                     'user_id' => $user->id,
                     'video_url' => 'https://www.w3schools.com/html/mov_bbb.mp4',
                     'thumbnail_url' => $images[$i],
                     'caption' => "Check out this amazing {$categories[$i]} content! #AmazamaHub #{$categories[$i]}",
                     'category' => $categories[$i],
                     'music_name' => "Original Sound - {$user->username}",
-                    'likes_count' => rand(100, 5000),
-                    'comments_count' => rand(10, 500),
                 ]);
+
+                $sampleComments = ["Hilarious! 😂", "Very helpful!", "Skills! 🎮", "Love this track!", "Great vlog!", "Trending now!"];
+                $commenters = array_rand($users, rand(1, 4));
+                foreach ((array)$commenters as $idx) {
+                    Comment::create(['user_id' => $users[$idx]->id, 'video_id' => $video->id, 'comment_text' => $sampleComments[array_rand($sampleComments)]]);
+                    $video->increment('comments_count');
+                }
+
+                $likers = array_rand($users, rand(2, 5));
+                foreach ((array)$likers as $idx) {
+                    Like::create(['user_id' => $users[$idx]->id, 'video_id' => $video->id]);
+                    $video->increment('likes_count');
+                }
             }
         }
     }

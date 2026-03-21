@@ -4,6 +4,9 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\Video;
+use App\Models\Comment;
+use App\Models\Like;
+use App\Models\Follow;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -24,8 +27,9 @@ class RwandanUserSeeder extends Seeder
             ['name' => 'Iradukunda Faith', 'username' => 'iradukunda_f', 'email' => 'iradukunda@example.com'],
         ];
 
+        $users = [];
         foreach ($rwandanUsers as $userData) {
-            $user = User::create([
+            $users[] = User::create([
                 'name' => $userData['name'],
                 'username' => $userData['username'],
                 'email' => $userData['email'],
@@ -33,8 +37,9 @@ class RwandanUserSeeder extends Seeder
                 'avatar' => "https://i.pravatar.cc/150?u={$userData['username']}",
                 'bio' => "Official AmazamaHub Creator from Rwanda 🇷🇼",
             ]);
+        }
 
-            // Create 3 videos per user
+        foreach ($users as $user) {
             $categories = ['Trending', 'Comedy', 'Education', 'Gaming', 'Music', 'Vlogs'];
             $videos = [
                 ['url' => 'https://vjs.zencdn.net/v/oceans.mp4', 'thumb' => 'https://images.pexels.com/photos/1001633/pexels-photo-1001633.jpeg?auto=compress&cs=tinysrgb&w=600'],
@@ -43,16 +48,34 @@ class RwandanUserSeeder extends Seeder
             ];
 
             foreach ($videos as $vData) {
-                Video::create([
+                $video = Video::create([
                     'user_id' => $user->id,
                     'video_url' => $vData['url'],
                     'thumbnail_url' => $vData['thumb'],
                     'caption' => "Muraho! This is my latest video from #Rwanda. Subscribe for more! 🇷🇼 #AmazamaHub #Kigali",
                     'category' => $categories[array_rand($categories)],
                     'music_name' => "Rwandan Vibes - {$user->name}",
-                    'likes_count' => rand(100, 10000),
-                    'comments_count' => rand(50, 500),
                 ]);
+
+                $sampleComments = ["Beautiful! 🇷🇼", "Wow, Kigali!", "Great content!", "Amazing! 🔥", "Proud!"];
+                $commenters = array_rand($users, rand(2, 4));
+                foreach ((array)$commenters as $idx) {
+                    Comment::create(['user_id' => $users[$idx]->id, 'video_id' => $video->id, 'comment_text' => $sampleComments[array_rand($sampleComments)]]);
+                    $video->increment('comments_count');
+                }
+
+                $likers = array_rand($users, rand(3, 6));
+                foreach ((array)$likers as $idx) {
+                    Like::create(['user_id' => $users[$idx]->id, 'video_id' => $video->id]);
+                    $video->increment('likes_count');
+                }
+            }
+
+            $following = array_rand($users, rand(2, 4));
+            foreach ((array)$following as $idx) {
+                if ($users[$idx]->id !== $user->id) {
+                    Follow::firstOrCreate(['follower_id' => $user->id, 'following_id' => $users[$idx]->id]);
+                }
             }
         }
     }

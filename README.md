@@ -1,6 +1,6 @@
-# AmazamaHub - TikTok Clone (Laravel + React + Inertia) 🇷🇼🔥🎬🚀
+# AmazamaHub - TikTok Clone (Laravel + React + Inertia) 🇷🇼
 
-## 🚀 How to Run the Project
+## How to Run the Project
 Follow these steps to get the project running on your local machine with all the data (videos, users, etc.) perfectly synchronized.
 
 ---
@@ -59,8 +59,8 @@ npm run dev
 
 ---
 
-### 🌐 Access the App
+### Access the App
 Once both servers are running, open your browser and go to:
 [**http://127.0.0.1:8000**](http://127.0.0.1:8000)
 
-**Your high-fidelity TikTok Clone is now live!** 🇷🇼🔥🎬🚀
+**Your high-fidelity TikTok Clone is now live!**
