@@ -7,6 +7,10 @@ use App\Models\Video;
 use App\Models\Comment;
 use App\Models\Like;
 use App\Models\Follow;
+use App\Models\Bookmark;
+use App\Models\Repost;
+use App\Models\Share;
+use App\Models\Message;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -53,30 +57,51 @@ class RwandanUserSeeder extends Seeder
                     'video_url' => $vData['url'],
                     'thumbnail_url' => $vData['thumb'],
                     'caption' => "Muraho! This is my latest video from #Rwanda. Subscribe for more! 🇷🇼 #AmazamaHub #Kigali",
-                    'category' => $categories[array_rand($categories)],
+                    'category' => $categories[$user->id % count($categories)],
                     'music_name' => "Rwandan Vibes - {$user->name}",
                 ]);
 
                 $sampleComments = ["Beautiful! 🇷🇼", "Wow, Kigali!", "Great content!", "Amazing! 🔥", "Proud!"];
-                $commenters = array_rand($users, rand(2, 4));
-                foreach ((array)$commenters as $idx) {
-                    Comment::create(['user_id' => $users[$idx]->id, 'video_id' => $video->id, 'comment_text' => $sampleComments[array_rand($sampleComments)]]);
-                    $video->increment('comments_count');
-                }
-
-                $likers = array_rand($users, rand(3, 6));
-                foreach ((array)$likers as $idx) {
-                    Like::create(['user_id' => $users[$idx]->id, 'video_id' => $video->id]);
+                // Multi-Table Deterministic Seeding (Likes, Comments, Bookmarks, Reposts, Shares)
+                for ($i = 0; $i < 5; $i++) {
+                    $u = $users[$i % count($users)];
+                    Like::create(['user_id' => $u->id, 'video_id' => $video->id]);
+                    Bookmark::create(['user_id' => $u->id, 'video_id' => $video->id]);
+                    Repost::create(['user_id' => $u->id, 'video_id' => $video->id]);
+                    Share::create(['user_id' => $u->id, 'video_id' => $video->id]);
                     $video->increment('likes_count');
+                    $video->increment('bookmarks_count');
+                    $video->increment('reposts_count');
+                    $video->increment('shares_count');
+
+                    if ($i < 3) {
+                        Comment::create([
+                            'user_id' => $u->id,
+                            'video_id' => $video->id,
+                            'comment_text' => $sampleComments[$i % count($sampleComments)]
+                        ]);
+                        $video->increment('comments_count');
+                    }
                 }
             }
 
-            $following = array_rand($users, rand(2, 4));
-            foreach ((array)$following as $idx) {
-                if ($users[$idx]->id !== $user->id) {
-                    Follow::firstOrCreate(['follower_id' => $user->id, 'following_id' => $users[$idx]->id]);
+            // Deterministic Follows
+            for ($i = 0; $i < 4; $i++) {
+                if ($users[$i]->id !== $user->id) {
+                    Follow::firstOrCreate(['follower_id' => $user->id, 'following_id' => $users[$i]->id]);
                 }
             }
+        }
+
+        // Deterministic Messages (Global)
+        for ($i = 0; $i < count($users) - 1; $i++) {
+            Message::create([
+                'sender_id' => $users[$i]->id,
+                'receiver_id' => $users[$i+1]->id,
+                'message' => "Hello! Nice to meet you on AmazamaHub. 🇷🇼",
+                'is_read' => false,
+                'type' => 'text'
+            ]);
         }
     }
 }

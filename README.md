@@ -40,7 +40,9 @@ To see the **same videos, users, and social interactions** as the production env
 php artisan migrate:fresh --seed
 ```
 
-This command builds your local database and populates it with our **Rwandan Creator Suite** and **Explore Discoveries**.
+This command builds your local database and populates it with our **deterministic Rwandan Creator Suite**.
+
+💡 **Sync Exactly What I See**: I have updated the seeders to be **100% Deterministic**. This means that anyone who runs this command will see the **exact same** users, videos, comments, and follower interactions. No random data is used—it follows a fixed high-fidelity blueprint.
 
 ---
 
