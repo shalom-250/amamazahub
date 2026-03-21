@@ -18,7 +18,7 @@ Open your terminal in the project directory (`d:\amamazahub`) and run the follow
 
 ```powershell
 # Install PHP dependencies
-composer install
+
 
 # Install JS dependencies
 npm install
