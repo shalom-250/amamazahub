@@ -3,6 +3,7 @@ import AppLayout from '../Components/AppLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { Edit2, Grid, Lock, Heart, Share2, BadgeCheck, Plus, Check, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Watermark from '../Components/Watermark';
 import axios from 'axios';
 
 export default function Profile({ profileUser, videos, stats, isFollowing: initialFollowing, isOwnProfile }) {
@@ -45,7 +46,7 @@ export default function Profile({ profileUser, videos, stats, isFollowing: initi
                             <div>
                                 <div className="flex items-center space-x-2">
                                     <h1 className="text-2xl md:text-3xl font-black italic tracking-tighter text-white">{profileUser.name}</h1>
-                                    <BadgeCheck className="text-blue-400 fill-blue-400/20" size={22} />
+                                    <BadgeCheck className="text-primary fill-primary/20" size={22} />
                                 </div>
                                 <p className="text-md font-black italic text-gray-400 tracking-tight">@{profileUser.username}</p>
                             </div>
@@ -143,7 +144,16 @@ export default function Profile({ profileUser, videos, stats, isFollowing: initi
                                 key={v.id}
                                 className="aspect-[9/16] bg-gray-950 rounded-lg overflow-hidden relative group cursor-pointer border border-white/5 hover:border-white/20 transition-all duration-300"
                             >
-                                <img src={v.thumbnail_url} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition duration-700" alt="video" />
+                                <video
+                                    src={v.video_url}
+                                    onMouseEnter={(e) => e.target.play()}
+                                    onMouseLeave={(e) => { e.target.pause(); e.target.currentTime = 0; }}
+                                    loop
+                                    muted
+                                    playsInline
+                                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition duration-700 pointer-events-none"
+                                />
+                                <Watermark size="sm" className="bottom-2 right-2 scale-75 transform origin-bottom-right" />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-90 transition duration-300 flex items-end p-3">
                                     <div className="flex items-center space-x-1.5 text-white text-xs font-black italic tracking-tighter">
                                         <Heart size={14} className="text-primary fill-primary" />

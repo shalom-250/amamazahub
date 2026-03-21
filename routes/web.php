@@ -39,8 +39,15 @@ Route::get('/following', [FollowController::class, 'index'])->name('following');
 
 Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->middleware('auth');
 
-Route::get('/live', function () {
-    return Inertia::render('Live');
+Route::get('/live', [App\Http\Controllers\LiveController::class, 'index'])->name('live.index');
+Route::middleware('auth')->group(function () {
+    Route::get('/live/create', [App\Http\Controllers\LiveController::class, 'create'])->name('live.create');
+    Route::post('/live', [App\Http\Controllers\LiveController::class, 'store'])->name('live.store');
+    Route::get('/live/{session}', [App\Http\Controllers\LiveController::class, 'show'])->name('live.show');
+    Route::post('/live/{session}/message', [App\Http\Controllers\LiveController::class, 'sendMessage'])->name('live.message');
+    Route::post('/live/{session}/like', [App\Http\Controllers\LiveController::class, 'toggleLike'])->name('live.like');
+    Route::get('/live/{session}/sync', [App\Http\Controllers\LiveController::class, 'sync'])->name('live.sync');
+    Route::post('/live/{session}/end', [App\Http\Controllers\LiveController::class, 'end'])->name('live.end');
 });
 
 Route::middleware('auth')->group(function () {
@@ -157,4 +164,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/videos/{video}/like', [App\Http\Controllers\LikeController::class, 'toggle']);
     Route::post('/videos/{video}/comment', [App\Http\Controllers\CommentController::class, 'store']);
     Route::get('/videos/{video}/comments', [App\Http\Controllers\CommentController::class, 'index']);
+    Route::post('/comments/{comment}/like', [App\Http\Controllers\CommentController::class, 'toggleLike']);
+    Route::get('/comments/{comment}/replies', [App\Http\Controllers\CommentController::class, 'replies']);
 });

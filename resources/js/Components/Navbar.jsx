@@ -10,12 +10,10 @@ export default function Navbar({ user }) {
         <nav className="h-16 border-b border-gray-800 flex items-center justify-between px-4 md:px-8 bg-black/80 backdrop-blur-xl sticky top-0 z-50">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-2 group">
-                <div className="w-10 h-10 bg-gradient-to-tr from-primary to-cyan-400 rounded-lg flex items-center justify-center p-1.5 shadow-lg shadow-primary/20 group-hover:scale-110 transition duration-300">
-                    <svg viewBox="0 0 24 24" className="w-full h-full text-black fill-current stroke-black" strokeWidth="2">
-                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                    </svg>
+                <div className="w-10 h-10 rounded-lg overflow-hidden shadow-lg shadow-primary/20 group-hover:scale-110 transition duration-300">
+                    <img src="/images/logo.png" className="w-full h-full object-cover" alt="AmazamaHub Logo" />
                 </div>
-                <h1 className="text-2xl font-black italic tracking-tighter hover:text-primary transition duration-300">AMAZAMAHUB</h1>
+                <h1 className="text-2xl font-black italic tracking-tighter hover:text-primary transition duration-300 uppercase">AmazamaHub</h1>
             </Link>
 
             {/* Search */}

@@ -3,6 +3,7 @@ import AppLayout from '../Components/AppLayout';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { Heart, MessageCircle, Share2, Music, Flag, MoreHorizontal, Send, Bookmark, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Watermark from '../Components/Watermark';
 import axios from 'axios';
 
 export default function VideoDetail({ video }) {
@@ -14,6 +15,7 @@ export default function VideoDetail({ video }) {
     const [bookmarksCount, setBookmarksCount] = useState(video.bookmarks_count || 0);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [commentText, setCommentText] = useState('');
+    const [replyTo, setReplyTo] = useState(null);
     const [commentsCount, setCommentsCount] = useState(video.comments_count || 0);
     const [comments, setComments] = useState(video.comments || []);
 
@@ -46,16 +48,65 @@ export default function VideoDetail({ video }) {
         }
     };
 
+    const toggleCommentLike = async (commentId, isReply = false, parentId = null) => {
+        try {
+            const response = await axios.post(`/comments/${commentId}/like`);
+            if (isReply && parentId) {
+                setComments(prev => prev.map(c => {
+                    if (c.id === parentId && c.replies) {
+                        return {
+                            ...c,
+                            replies: c.replies.map(r => r.id === commentId ? { ...r, likes_exists: response.data.liked, likes_count: response.data.likes_count } : r)
+                        };
+                    }
+                    return c;
+                }));
+            } else {
+                setComments(prev => prev.map(c => c.id === commentId ? { ...c, likes_exists: response.data.liked, likes_count: response.data.likes_count } : c));
+            }
+        } catch (error) {
+            console.error('Error toggling comment like', error);
+        }
+    };
+
+    const fetchReplies = async (commentId) => {
+        try {
+            const response = await axios.get(`/comments/${commentId}/replies`);
+            setComments(prev => prev.map(c => c.id === commentId ? { ...c, replies: response.data, showReplies: true } : c));
+        } catch (error) {
+            console.error('Error fetching replies', error);
+        }
+    };
+
     const handlePostComment = async () => {
         if (!commentText.trim() || isSubmitting) return;
         setIsSubmitting(true);
         try {
             const response = await axios.post(`/videos/${video.id}/comment`, {
-                comment_text: commentText
+                comment_text: commentText,
+                parent_id: replyTo?.id
             });
-            setComments([response.data.comment, ...comments]);
+
+            if (replyTo) {
+                // Add to replies list if parent is loaded
+                setComments(prev => prev.map(c => {
+                    if (c.id === replyTo.id) {
+                        return {
+                            ...c,
+                            replies_count: (c.replies_count || 0) + 1,
+                            replies: c.replies ? [response.data.comment, ...c.replies] : undefined,
+                            showReplies: c.replies ? true : false
+                        };
+                    }
+                    return c;
+                }));
+            } else {
+                setComments([response.data.comment, ...comments]);
+            }
+
             setCommentsCount(response.data.comments_count);
             setCommentText('');
+            setReplyTo(null);
         } catch (error) {
             console.error('Error posting comment', error);
         } finally {
@@ -77,6 +128,7 @@ export default function VideoDetail({ video }) {
                         loop
                         className="max-h-full max-w-full object-contain"
                     />
+                    <Watermark size="lg" className="bottom-12 right-12 opacity-60 hover:opacity-100 transition duration-300" />
                     <Link href="/explore" className="absolute top-6 left-6 text-white hover:bg-white/10 p-2 rounded-full cursor-pointer transition">
                         <X size={28} />
                     </Link>
@@ -149,19 +201,74 @@ export default function VideoDetail({ video }) {
                             </div>
                         ) : (
                             comments.map((comment) => (
-                                <div key={comment.id} className="flex space-x-4 group">
-                                    <Link href={`/profile/@${comment.user.username}`} className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-gray-900 border border-gray-800">
-                                        <img src={comment.user.avatar || `https://ui-avatars.com/api/?name=${comment.user.username}`} className="w-full h-full object-cover" />
-                                    </Link>
-                                    <div className="flex-1 space-y-1">
-                                        <div className="flex items-center justify-between">
-                                            <p className="text-xs font-black italic text-gray-400 uppercase tracking-widest">@{comment.user.username}</p>
-                                            <Heart size={14} className="text-gray-700 hover:text-red-500 cursor-pointer transition" />
-                                        </div>
-                                        <p className="text-sm font-medium text-gray-200">{comment.comment_text}</p>
-                                        <div className="flex items-center space-x-4 pt-1">
-                                            <span className="text-[10px] text-gray-600 font-bold truncate">Just now</span>
-                                            <span className="text-[10px] text-gray-500 font-black cursor-pointer hover:underline">Reply</span>
+                                <div key={comment.id} className="space-y-4">
+                                    <div className="flex space-x-4 group">
+                                        <Link href={`/profile/@${comment.user.username}`} className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-gray-900 border border-gray-800">
+                                            <img src={comment.user.avatar || `https://ui-avatars.com/api/?name=${comment.user.username}`} className="w-full h-full object-cover" />
+                                        </Link>
+                                        <div className="flex-1 space-y-1">
+                                            <div className="flex items-center justify-between">
+                                                <p className="text-xs font-black italic text-gray-400 uppercase tracking-widest">@{comment.user.username}</p>
+                                                <div className="flex flex-col items-center">
+                                                    <Heart
+                                                        size={14}
+                                                        onClick={() => toggleCommentLike(comment.id)}
+                                                        className={`cursor-pointer transition ${comment.likes_exists ? 'text-primary fill-primary' : 'text-gray-700 hover:text-red-500'}`}
+                                                    />
+                                                    <span className="text-[8px] font-black text-gray-600 mt-1">{comment.likes_count || 0}</span>
+                                                </div>
+                                            </div>
+                                            <p className="text-sm font-medium text-gray-200">{comment.comment_text}</p>
+                                            <div className="flex items-center space-x-4 pt-1">
+                                                <span className="text-[10px] text-gray-600 font-bold truncate">Just now</span>
+                                                <span
+                                                    onClick={() => {
+                                                        setReplyTo(comment);
+                                                        setCommentText(`@${comment.user.username} `);
+                                                    }}
+                                                    className="text-[10px] text-gray-500 font-black cursor-pointer hover:underline"
+                                                >
+                                                    Reply
+                                                </span>
+                                            </div>
+
+                                            {/* Replies Toggle */}
+                                            {comment.replies_count > 0 && !comment.showReplies && (
+                                                <button
+                                                    onClick={() => fetchReplies(comment.id)}
+                                                    className="text-[10px] font-black text-gray-500 mt-2 flex items-center space-x-2 hover:text-white transition"
+                                                >
+                                                    <div className="w-4 h-[1px] bg-gray-800"></div>
+                                                    <span>View {comment.replies_count} replies</span>
+                                                </button>
+                                            )}
+
+                                            {/* Replies List */}
+                                            {comment.showReplies && comment.replies && (
+                                                <div className="space-y-4 mt-4 pl-2 border-l border-gray-900">
+                                                    {comment.replies.map(reply => (
+                                                        <div key={reply.id} className="flex space-x-3 group/reply">
+                                                            <Link href={`/profile/@${reply.user.username}`} className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 bg-gray-900 border border-gray-800">
+                                                                <img src={reply.user.avatar || `https://ui-avatars.com/api/?name=${reply.user.username}`} className="w-full h-full object-cover" />
+                                                            </Link>
+                                                            <div className="flex-1 space-y-0.5">
+                                                                <div className="flex items-center justify-between">
+                                                                    <p className="text-[10px] font-black italic text-gray-500">@{reply.user.username}</p>
+                                                                    <div className="flex items-center space-x-1">
+                                                                        <Heart
+                                                                            size={12}
+                                                                            onClick={() => toggleCommentLike(reply.id, true, comment.id)}
+                                                                            className={`cursor-pointer transition ${reply.likes_exists ? 'text-primary fill-primary' : 'text-gray-800 hover:text-red-500'}`}
+                                                                        />
+                                                                        <span className="text-[8px] font-black text-gray-700">{reply.likes_count || 0}</span>
+                                                                    </div>
+                                                                </div>
+                                                                <p className="text-xs font-medium text-gray-300">{reply.comment_text}</p>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -171,13 +278,28 @@ export default function VideoDetail({ video }) {
 
                     {/* Input Area */}
                     <div className="p-6 border-t border-gray-900 bg-black">
+                        {replyTo && (
+                            <div className="flex items-center justify-between mb-3 bg-gray-900/40 px-4 py-2 rounded-xl animate-in slide-in-from-bottom-2 fade-in duration-300">
+                                <p className="text-[10px] font-black text-gray-500 italic uppercase tracking-widest">
+                                    Replying to <span className="text-primary">@{replyTo.user.username}</span>
+                                </p>
+                                <X
+                                    size={14}
+                                    className="text-gray-500 cursor-pointer hover:text-white"
+                                    onClick={() => {
+                                        setReplyTo(null);
+                                        setCommentText('');
+                                    }}
+                                />
+                            </div>
+                        )}
                         <div className="relative">
                             <input
                                 value={commentText}
                                 onChange={(e) => setCommentText(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && handlePostComment()}
                                 type="text"
-                                placeholder="Add real comment..."
+                                placeholder={replyTo ? "Add a reply..." : "Add a real comment..."}
                                 className="w-full bg-gray-900 border border-transparent focus:border-primary/50 py-4 px-6 pr-14 rounded-2xl text-sm font-medium transition"
                             />
                             <button

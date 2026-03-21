@@ -80,7 +80,7 @@ export default function Sidebar({ user }) {
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center space-x-1">
                                     <p className="text-sm font-black truncate">{acc.username}</p>
-                                    <CheckCircle2 className="text-blue-400 fill-blue-400/20 flex-shrink-0" size={14} />
+                                    <CheckCircle2 className="text-primary fill-primary/20 flex-shrink-0" size={14} />
                                 </div>
                                 <p className="text-[10px] text-gray-500 truncate font-semibold">{acc.name}</p>
                             </div>

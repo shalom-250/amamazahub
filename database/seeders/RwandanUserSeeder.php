@@ -46,9 +46,9 @@ class RwandanUserSeeder extends Seeder
         foreach ($users as $user) {
             $categories = ['Trending', 'Comedy', 'Education', 'Gaming', 'Music', 'Vlogs'];
             $videos = [
-                ['url' => 'https://vjs.zencdn.net/v/oceans.mp4', 'thumb' => 'https://images.pexels.com/photos/1001633/pexels-photo-1001633.jpeg?auto=compress&cs=tinysrgb&w=600'],
-                ['url' => 'https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_1mb.mp4', 'thumb' => 'https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg?auto=compress&cs=tinysrgb&w=600'],
-                ['url' => 'https://www.w3schools.com/html/mov_bbb.mp4', 'thumb' => 'https://images.pexels.com/photos/1181263/pexels-photo-1181263.jpeg?auto=compress&cs=tinysrgb&w=600'],
+                ['url' => 'https://vjs.zencdn.net/v/oceans.mp4', 'thumb' => url('/images/logo.png')],
+                ['url' => 'https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_1mb.mp4', 'thumb' => url('/images/logo.png')],
+                ['url' => 'https://www.w3schools.com/html/mov_bbb.mp4', 'thumb' => url('/images/logo.png')],
             ];
 
             foreach ($videos as $vData) {

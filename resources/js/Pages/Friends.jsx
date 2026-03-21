@@ -3,6 +3,7 @@ import AppLayout from '../Components/AppLayout';
 import { Head, Link } from '@inertiajs/react';
 import { Users, UserPlus, MessageCircle, Heart, Share2, Music } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Watermark from '../Components/Watermark';
 
 export default function Friends({ friends = [], videos = [], auth }) {
     return (
@@ -41,42 +42,54 @@ export default function Friends({ friends = [], videos = [], auth }) {
                 </div>
 
                 {/* Feed Section */}
-                <div className="space-y-12">
+                <div className="space-y-6">
                     {videos.length > 0 ? (
-                        <div className="space-y-8">
-                            <h2 className="text-sm font-black italic uppercase tracking-widest text-gray-500">Recent from friends</h2>
-                            {videos.map((video) => (
-                                <div key={video.id} className="bg-gray-900/40 rounded-[40px] overflow-hidden border border-gray-800 group transition hover:border-primary/20">
-                                    <Link href={`/v/${video.id}`} className="block relative aspect-video bg-black">
-                                        <video src={video.video_path} className="w-full h-full object-cover group-hover:scale-105 transition duration-700" muted onMouseOver={e => e.target.play()} onMouseOut={e => e.target.pause()} />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-500 p-8 flex flex-col justify-end">
-                                            <p className="font-black italic text-lg">{video.title}</p>
-                                        </div>
-                                    </Link>
-                                    <div className="p-6 flex items-center justify-between">
-                                        <Link href={`/profile/@${video.user.username}`} className="flex items-center space-x-3">
-                                            <div className="w-10 h-10 rounded-full border border-primary/20 overflow-hidden">
-                                                <img src={video.user.avatar} className="w-full h-full object-cover" />
-                                            </div>
-                                            <div>
-                                                <p className="text-sm font-black italic">@{video.user.username}</p>
-                                                <p className="text-[10px] text-gray-500 font-bold uppercase">{video.created_at_human || 'Recently posted'}</p>
+                        <>
+                            <h2 className="text-sm font-black italic uppercase tracking-widest text-gray-500 px-1">Recent from friends</h2>
+                            <div className="grid grid-cols-2 gap-4">
+                                {videos.map((video) => (
+                                    <div key={video.id} className="relative aspect-[9/15] bg-gray-900 rounded-[24px] overflow-hidden group shadow-lg border border-white/5 hover:border-primary/30 transition-all duration-500">
+                                        <Link href={`/v/${video.id}`} className="block w-full h-full">
+                                            <video
+                                                src={video.video_url}
+                                                className="w-full h-full object-cover group-hover:scale-110 transition duration-700"
+                                                muted
+                                                onMouseOver={e => {
+                                                    const playPromise = e.target.play();
+                                                    if (playPromise !== undefined) {
+                                                        playPromise.catch(() => { });
+                                                    }
+                                                }}
+                                                onMouseOut={e => e.target.pause()}
+                                            />
+                                            <Watermark size="sm" className="bottom-2 right-2 scale-75 transform origin-bottom-right" />
+                                            {/* Overlay Info */}
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent p-4 flex flex-col justify-end">
+                                                <div className="flex items-center space-x-2 mb-2">
+                                                    <div className="w-6 h-6 rounded-full border border-primary/40 overflow-hidden bg-black/50">
+                                                        <img src={video.user?.avatar || `https://ui-avatars.com/api/?name=${video.user?.username}`} className="w-full h-full object-cover" />
+                                                    </div>
+                                                    <span className="text-[10px] font-black italic text-white truncate shadow-sm">@{video.user?.username}</span>
+                                                </div>
+                                                <p className="text-[10px] font-bold text-white/90 line-clamp-1 italic tracking-tight mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                                    {video.title || video.caption}
+                                                </p>
+                                                <div className="flex items-center space-x-3 text-white/80">
+                                                    <div className="flex items-center space-x-1">
+                                                        <Heart size={12} className={video.likes_exists ? 'text-primary fill-primary' : ''} />
+                                                        <span className="text-[10px] font-black">{video.likes_count}</span>
+                                                    </div>
+                                                    <div className="flex items-center space-x-1">
+                                                        <MessageCircle size={12} />
+                                                        <span className="text-[10px] font-black">{video.comments_count}</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </Link>
-                                        <div className="flex space-x-4 text-gray-500">
-                                            <div className="flex items-center space-x-1">
-                                                <Heart size={16} className={video.likes_exists ? 'text-primary fill-primary' : ''} />
-                                                <span className="text-xs font-black">{video.likes_count}</span>
-                                            </div>
-                                            <div className="flex items-center space-x-1">
-                                                <MessageCircle size={16} />
-                                                <span className="text-xs font-black">{video.comments_count}</span>
-                                            </div>
-                                        </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
+                        </>
                     ) : (
                         <div className="bg-gray-900/20 rounded-[40px] aspect-[9/10] flex flex-col items-center justify-center text-center p-12 border border-gray-900/50 shadow-2xl relative overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-20"></div>

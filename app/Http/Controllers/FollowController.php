@@ -90,20 +90,33 @@ class FollowController extends Controller
         $user = Auth::user();
         if (!$user) return Inertia::render('Friends', ['friends' => [], 'videos' => []]);
 
-        // Get mutual friends
+        // Get mutual friends for the top bar
         $friends = $user->friends()->get();
 
-        // Get videos from friends
+        // Try getting videos from mutual friends first
         $friendIds = $friends->pluck('id');
         $videos = Video::whereIn('user_id', $friendIds)
             ->with(['user', 'likes', 'comments'])
             ->withCount(['likes', 'comments'])
             ->latest()
-            ->get()
-            ->map(function($video) use ($user) {
-                $video->likes_exists = $video->likes->where('user_id', $user->id)->count() > 0;
-                return $video;
-            });
+            ->limit(20)
+            ->get();
+
+        // Fallback: If no mutual friends have videos, show videos from EVERYONE you follow
+        if ($videos->isEmpty()) {
+            $followingIds = $user->following()->pluck('users.id');
+            $videos = Video::whereIn('user_id', $followingIds)
+                ->with(['user', 'likes', 'comments'])
+                ->withCount(['likes', 'comments'])
+                ->latest()
+                ->limit(20)
+                ->get();
+        }
+
+        $videos = $videos->map(function($video) use ($user) {
+            $video->likes_exists = $video->likes->where('user_id', $user->id)->count() > 0;
+            return $video;
+        });
 
         return Inertia::render('Friends', [
             'friends' => $friends,

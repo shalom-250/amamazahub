@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Video;
+use App\Models\Comment;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
@@ -46,19 +47,35 @@ class VideoController extends Controller
 
     public function show(Video $video)
     {
-        $video->load(['user' => function ($q) {
-            $q->withExists(['followers as is_followed' => function ($f) {
-                $f->where('follower_id', Auth::id());
+        $user = Auth::user();
+        $video->load(['user' => function ($q) use ($user) {
+            $q->withExists(['followers as is_followed' => function ($f) use ($user) {
+                $f->where('follower_id', $user?->id);
             }]);
-        }, 'comments' => function ($c) {
-            $c->with('user')->latest();
         }]);
 
         $video->loadCount(['likes', 'comments', 'reposts', 'shares', 'bookmarks']);
         
-        $video->likes_exists = $video->likes()->where('user_id', Auth::id())->exists();
-        $video->reposts_exists = $video->reposts()->where('user_id', Auth::id())->exists();
-        $video->bookmarks_exists = $video->bookmarks()->where('user_id', Auth::id())->exists();
+        $video->likes_exists = $user ? $video->likes()->where('user_id', $user->id)->exists() : false;
+        $video->reposts_exists = $user ? $video->reposts()->where('user_id', $user->id)->exists() : false;
+        $video->bookmarks_exists = $user ? $video->bookmarks()->where('user_id', $user->id)->exists() : false;
+
+        // Fetch top-level comments with counts and user like status
+        $comments = Comment::where('video_id', $video->id)
+            ->whereNull('parent_id')
+            ->with(['user'])
+            ->withCount(['likes', 'replies'])
+            ->latest()
+            ->get();
+
+        if ($user) {
+            $comments->transform(function ($comment) use ($user) {
+                $comment->likes_exists = $comment->likes()->where('user_id', $user->id)->exists();
+                return $comment;
+            });
+        }
+
+        $video->comments = $comments;
 
         return Inertia::render('VideoDetail', [
             'video' => $video
@@ -84,7 +101,7 @@ class VideoController extends Controller
         Video::create([
             'user_id' => Auth::id(),
             'video_url' => url('/uploads/videos/' . $filename),
-            'thumbnail_url' => 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1000&auto=format&fit=crop',
+            'thumbnail_url' => url('/images/logo.png'),
             'caption' => $request->caption,
             'category' => $request->category,
             'music_name' => 'Original Sound - ' . Auth::user()->username,

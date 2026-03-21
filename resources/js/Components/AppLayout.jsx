@@ -59,7 +59,7 @@ export default function AppLayout({ children }) {
                         <Plus size={20} className="text-black" />
                     </div>
                     <div className="absolute inset-0 bg-primary -left-1 rounded-lg"></div>
-                    <div className="absolute inset-0 bg-cyan-400 -right-1 rounded-lg"></div>
+                    <div className="absolute inset-0 bg-orange-500 -right-1 rounded-lg"></div>
                 </Link>
                 <Link href="/notifications" className="text-gray-400 flex flex-col items-center relative">
                     <Bell size={24} />

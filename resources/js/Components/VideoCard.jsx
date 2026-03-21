@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Heart, MessageCircle, Share2, Bookmark, Music2, Plus, CheckCircle2, Repeat } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Watermark from './Watermark';
 import axios from 'axios';
 
 export default function VideoCard({ video }) {
@@ -143,7 +144,7 @@ export default function VideoCard({ video }) {
         if (!isLiked) {
             toggleLike();
         }
-        
+
         const id = Math.random();
         setShowHeart({ x, y, id });
 
@@ -192,6 +193,9 @@ export default function VideoCard({ video }) {
                     src={video.video_url}
                 />
 
+                {/* Brand Watermark */}
+                <Watermark size="lg" className="bottom-20 right-4" />
+
                 {/* Double Tap Heart Animation */}
                 <AnimatePresence>
                     {showHeart && (
@@ -230,7 +234,7 @@ export default function VideoCard({ video }) {
                         >
                             @{video.user.username}
                             {video.user.username === 'amazamahub_official' && (
-                                <CheckCircle2 size={16} className="ml-1 text-cyan-400 fill-cyan-400/20" />
+                                <CheckCircle2 size={16} className="ml-1 text-primary fill-primary/20" />
                             )}
                         </motion.h3>
                         <p className="text-sm font-medium line-clamp-2 pr-4">{video.caption}</p>
@@ -282,7 +286,7 @@ export default function VideoCard({ video }) {
                             <MessageCircle size={26} />
                         </div>
                         <span className="text-[10px] font-black mt-1 shadow-black text-white uppercase tracking-tighter">
-                             {Intl.NumberFormat('en-US', { notation: 'compact' }).format(commentsCount)}
+                            {Intl.NumberFormat('en-US', { notation: 'compact' }).format(commentsCount)}
                         </span>
                     </div>
 
@@ -344,7 +348,7 @@ export default function VideoCard({ video }) {
                 <AnimatePresence>
                     {showComments && (
                         <div className="absolute inset-0 z-50 flex flex-col justify-end bg-black/40 backdrop-blur-sm" onClick={() => setShowComments(false)}>
-                            <motion.div 
+                            <motion.div
                                 initial={{ y: '100%' }}
                                 animate={{ y: 0 }}
                                 exit={{ y: '100%' }}
@@ -361,43 +365,43 @@ export default function VideoCard({ video }) {
                                 </div>
 
                                 <div className="flex-1 overflow-y-auto space-y-6 px-2 custom-scrollbar pb-24">
-                                     {comments.length === 0 ? (
-                                         <div className="flex flex-col items-center justify-center py-12 text-gray-700">
-                                             <MessageCircle size={48} className="mb-4 opacity-20" />
-                                             <p className="font-black italic uppercase tracking-widest text-xs">No comments yet</p>
-                                             <p className="text-[10px] mt-1">Be the first to say something!</p>
-                                         </div>
-                                     ) : (
-                                         comments.map((c, i) => (
-                                             <div key={i} className="flex space-x-4">
-                                                 <img src={c.user.avatar || `https://ui-avatars.com/api/?name=${c.user.username}`} className="w-10 h-10 rounded-full border border-gray-800" />
-                                                 <div className="flex-1 space-y-1">
-                                                     <p className="text-[10px] font-black text-gray-400 italic">@{c.user.username} <span className="font-medium text-gray-600 ml-2">Just now</span></p>
-                                                     <p className="text-sm font-medium text-gray-100">{c.comment_text}</p>
-                                                 </div>
-                                             </div>
-                                         ))
-                                     )}
+                                    {comments.length === 0 ? (
+                                        <div className="flex flex-col items-center justify-center py-12 text-gray-700">
+                                            <MessageCircle size={48} className="mb-4 opacity-20" />
+                                            <p className="font-black italic uppercase tracking-widest text-xs">No comments yet</p>
+                                            <p className="text-[10px] mt-1">Be the first to say something!</p>
+                                        </div>
+                                    ) : (
+                                        comments.map((c, i) => (
+                                            <div key={i} className="flex space-x-4">
+                                                <img src={c.user.avatar || `https://ui-avatars.com/api/?name=${c.user.username}`} className="w-10 h-10 rounded-full border border-gray-800" />
+                                                <div className="flex-1 space-y-1">
+                                                    <p className="text-[10px] font-black text-gray-400 italic">@{c.user.username} <span className="font-medium text-gray-600 ml-2">Just now</span></p>
+                                                    <p className="text-sm font-medium text-gray-100">{c.comment_text}</p>
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
                                 </div>
 
                                 {/* Comment Input */}
                                 <div className="absolute bottom-0 left-0 right-0 p-6 bg-gray-950 border-t border-white/5 flex items-center space-x-4">
-                                     <div className="flex-1 bg-gray-900 rounded-2xl flex items-center px-4 border border-white/5 focus-within:border-primary/50 transition">
-                                         <input 
-                                             value={newComment}
-                                             onChange={(e) => setNewComment(e.target.value)}
-                                             onKeyDown={(e) => e.key === 'Enter' && handlePostComment()}
-                                             placeholder="Add a real comment..." 
-                                             className="bg-transparent border-none focus:ring-0 text-sm py-4 w-full"
-                                         />
-                                     </div>
-                                     <button 
-                                         onClick={handlePostComment}
-                                         disabled={!newComment.trim() || isSubmitting}
-                                         className="bg-primary text-black font-black italic px-6 py-4 rounded-2xl hover:scale-105 transition disabled:opacity-50"
-                                     >
-                                         {isSubmitting ? '...' : 'Post'}
-                                     </button>
+                                    <div className="flex-1 bg-gray-900 rounded-2xl flex items-center px-4 border border-white/5 focus-within:border-primary/50 transition">
+                                        <input
+                                            value={newComment}
+                                            onChange={(e) => setNewComment(e.target.value)}
+                                            onKeyDown={(e) => e.key === 'Enter' && handlePostComment()}
+                                            placeholder="Add a real comment..."
+                                            className="bg-transparent border-none focus:ring-0 text-sm py-4 w-full"
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={handlePostComment}
+                                        disabled={!newComment.trim() || isSubmitting}
+                                        className="bg-primary text-black font-black italic px-6 py-4 rounded-2xl hover:scale-105 transition disabled:opacity-50"
+                                    >
+                                        {isSubmitting ? '...' : 'Post'}
+                                    </button>
                                 </div>
                             </motion.div>
                         </div>

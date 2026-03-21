@@ -39,12 +39,12 @@ class ExploreSeeder extends Seeder
         foreach ($users as $user) {
             $categories = ['Trending', 'Comedy', 'Education', 'Gaming', 'Music', 'Vlogs'];
             $images = [
-                 'https://images.pexels.com/photos/2161467/pexels-photo-2161467.jpeg?auto=compress&cs=tinysrgb&w=600',
-                 'https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=600',
-                 'https://images.pexels.com/photos/1671325/pexels-photo-1671325.jpeg?auto=compress&cs=tinysrgb&w=600',
-                 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600',
-                 'https://images.pexels.com/photos/3408744/pexels-photo-3408744.jpeg?auto=compress&cs=tinysrgb&w=600',
-                 'https://images.pexels.com/photos/1624496/pexels-photo-1624496.jpeg?auto=compress&cs=tinysrgb&w=600'
+                 url('/images/logo.png'),
+                 url('/images/logo.png'),
+                 url('/images/logo.png'),
+                 url('/images/logo.png'),
+                 url('/images/logo.png'),
+                 url('/images/logo.png')
             ];
 
             for ($i = 0; $i < 6; $i++) {

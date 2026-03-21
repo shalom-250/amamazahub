@@ -33,13 +33,13 @@ class ExploreController extends Controller
                       $u->where('username', 'like', "%{$search}%");
                   });
             });
-        } else {
+        } elseif ($category !== 'All' && $category !== 'Trending') {
             $query->where('category', $category);
         }
 
         $videos = $query->latest()->paginate(12);
 
-        $categories = ['Trending', 'Comedy', 'Education', 'Gaming', 'Music', 'Vlogs'];
+        $categories = \App\Models\Category::pluck('name');
 
         return Inertia::render('Explore', [
             'videos' => $videos,

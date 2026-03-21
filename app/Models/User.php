@@ -76,6 +76,11 @@ class User extends Authenticatable
         return $this->hasMany(CartItem::class);
     }
 
+    public function likedComments()
+    {
+        return $this->belongsToMany(Comment::class, 'comment_likes');
+    }
+
     public function isFollowing(User $user)
     {
         return $this->following()->where('following_id', $user->id)->exists();

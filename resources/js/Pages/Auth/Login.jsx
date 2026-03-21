@@ -22,7 +22,7 @@ export default function Login() {
 
             {/* Background elements */}
             <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 blur-[120px] rounded-full"></div>
-            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyan-500/10 blur-[120px] rounded-full"></div>
+            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary/20 blur-[120px] rounded-full"></div>
 
             <Link href="/" className="absolute top-8 left-8 flex items-center space-x-2 text-gray-400 hover:text-white transition group">
                 <ChevronLeft className="group-hover:-translate-x-1 transition-transform" />
