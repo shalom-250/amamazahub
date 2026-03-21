@@ -57,7 +57,11 @@ export default function Navbar({ user }) {
                                 onClick={() => setShowDropdown(!showDropdown)}
                                 className="w-10 h-10 rounded-full bg-primary/20 border-2 border-primary flex items-center justify-center overflow-hidden hover:scale-105 transition"
                             >
-                                {user.avatar ? <img src={user.avatar} className="w-full h-full object-cover" /> : <span className="font-bold">{user.name[0]}</span>}
+                                {user.avatar ? (
+                                    <img src={user.avatar} className="w-full h-full object-cover" />
+                                ) : (
+                                    <span className="font-black italic text-sm">{user.name[0]?.toUpperCase()}</span>
+                                )}
                             </button>
 
                             {showDropdown && (

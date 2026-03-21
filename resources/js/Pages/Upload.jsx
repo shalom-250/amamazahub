@@ -34,7 +34,8 @@ export default function Upload() {
 
     const submit = (e) => {
         e.preventDefault();
-        post('/videos', {
+        post('/v/upload', {
+            forceFormData: true,
             onSuccess: () => {
                 setSuccess(true);
                 reset();
@@ -117,7 +118,7 @@ export default function Upload() {
 
                         {progress && (
                             <div className="w-full bg-gray-800 rounded-full h-1.5 overflow-hidden">
-                                <motion.div 
+                                <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: `${progress.percentage}%` }}
                                     className="bg-primary h-full"

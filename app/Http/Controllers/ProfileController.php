@@ -7,6 +7,8 @@ use App\Models\Video;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class ProfileController extends Controller
@@ -62,7 +64,7 @@ class ProfileController extends Controller
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users,username,'.$user->id,
             'bio' => 'nullable|string|max:80',
-            'avatar' => 'nullable|image|max:1024',
+            'avatar' => 'nullable|image|max:5120', // 5MB
         ]);
 
         $user->name = $request->name;
@@ -70,15 +72,23 @@ class ProfileController extends Controller
         $user->bio = $request->bio;
 
         if ($request->hasFile('avatar')) {
+            Log::info('[ProfileController] Avatar file received: ' . $request->file('avatar')->getClientOriginalName());
+
+            // Delete old avatar from storage if it's a storage path
             if ($user->avatar && str_contains($user->avatar, '/storage/')) {
                 Storage::delete(str_replace('/storage/', 'public/', $user->avatar));
             }
-            
-            $path = $request->file('avatar')->store('public/avatars');
-            $user->avatar = Storage::url($path);
+
+            // Store using the public disk so files are accessible via the symlink
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $user->avatar = '/storage/' . $path;
+
+            Log::info('[ProfileController] Avatar stored at: ' . $user->avatar);
         }
 
         $user->save();
+
+        Log::info('[ProfileController] User saved. Avatar: ' . $user->avatar);
 
         return redirect("/profile/@{$user->username}");
     }

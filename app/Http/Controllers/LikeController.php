@@ -27,6 +27,16 @@ class LikeController extends Controller
                 'user_id' => $user->id,
                 'video_id' => $video->id,
             ]);
+            
+            if ($video->user_id !== $user->id) {
+                \App\Models\Notification::create([
+                    'user_id' => $video->user_id,
+                    'sender_id' => $user->id,
+                    'type' => 'like',
+                    'reference_id' => $video->id,
+                ]);
+            }
+            
             $video->increment('likes_count');
             $liked = true;
         }

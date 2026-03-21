@@ -30,7 +30,7 @@ export default function Profile({ profileUser, videos, stats, isFollowing: initi
                 {/* Header Profile Section */}
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between space-y-6 md:space-y-0">
                     <div className="flex items-center space-x-6">
-                        <motion.div 
+                        <motion.div
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             className="w-24 md:w-32 h-24 md:h-32 rounded-full bg-gradient-to-br from-gray-950 to-primary border-4 border-gray-900 overflow-hidden flex items-center justify-center text-4xl font-black relative shadow-2xl"
@@ -49,7 +49,7 @@ export default function Profile({ profileUser, videos, stats, isFollowing: initi
                                 </div>
                                 <p className="text-md font-black italic text-gray-400 tracking-tight">@{profileUser.username}</p>
                             </div>
-                            
+
                             <div className="flex items-center space-x-3">
                                 {isOwnProfile ? (
                                     <Link href="/profile/edit" className="flex items-center space-x-2 bg-gray-900 hover:bg-gray-800 px-8 py-2.5 rounded-xl font-black italic text-sm border border-white/5 transition transform active:scale-95 shadow-2xl">
@@ -58,7 +58,7 @@ export default function Profile({ profileUser, videos, stats, isFollowing: initi
                                     </Link>
                                 ) : (
                                     <div className="flex items-center space-x-2">
-                                        <button 
+                                        <button
                                             onClick={toggleFollow}
                                             className={`flex items-center justify-center space-x-2 px-10 py-2.5 rounded-xl font-black italic text-sm transition transform active:scale-95 shadow-2xl border ${isFollowing ? 'bg-gray-900 text-white border-white/10 hover:bg-gray-800' : 'bg-primary text-black border-primary/20 hover:brightness-110'}`}
                                         >
@@ -74,8 +74,8 @@ export default function Profile({ profileUser, videos, stats, isFollowing: initi
                                                 </>
                                             )}
                                         </button>
-                                        <Link 
-                                            href="/messages" 
+                                        <Link
+                                            href="/messages"
                                             className="flex items-center justify-center space-x-2 px-8 py-2.5 rounded-xl font-black italic text-sm bg-gray-900 text-white border border-white/5 hover:bg-gray-800 transition transform active:scale-95 shadow-2xl"
                                         >
                                             <MessageSquare size={18} />
@@ -138,9 +138,9 @@ export default function Profile({ profileUser, videos, stats, isFollowing: initi
                 ) : (
                     <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1.5 px-0.5">
                         {videos.map((v) => (
-                            <Link 
-                                href="/video-detail" 
-                                key={v.id} 
+                            <Link
+                                href={`/v/${v.id}`}
+                                key={v.id}
                                 className="aspect-[9/16] bg-gray-950 rounded-lg overflow-hidden relative group cursor-pointer border border-white/5 hover:border-white/20 transition-all duration-300"
                             >
                                 <img src={v.thumbnail_url} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition duration-700" alt="video" />

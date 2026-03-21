@@ -34,15 +34,10 @@ Route::get('/messages', function () {
     return Inertia::render('Messages');
 });
 
-Route::get('/profile', function () {
-    return Inertia::render('Profile');
-});
 
 Route::get('/following', [FollowController::class, 'index'])->name('following');
 
-Route::get('/notifications', function () {
-    return Inertia::render('Notifications');
-});
+Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->middleware('auth');
 
 Route::get('/live', function () {
     return Inertia::render('Live');

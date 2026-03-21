@@ -36,7 +36,7 @@ class VideoController extends Controller
             $query->whereIn('user_id', $followingIds);
         }
 
-        $videos = $query->inRandomOrder()->paginate(10);
+        $videos = $query->latest()->paginate(10);
 
         return Inertia::render('Welcome', [
             'videos' => $videos,
@@ -83,7 +83,7 @@ class VideoController extends Controller
 
         Video::create([
             'user_id' => Auth::id(),
-            'video_url' => '/uploads/videos/' . $filename,
+            'video_url' => url('/uploads/videos/' . $filename),
             'thumbnail_url' => 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1000&auto=format&fit=crop',
             'caption' => $request->caption,
             'category' => $request->category,

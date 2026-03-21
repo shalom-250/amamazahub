@@ -42,6 +42,13 @@ class FollowController extends Controller
         } else {
             $follower->following()->attach($user->id);
             $following = true;
+            
+            \App\Models\Notification::create([
+                'user_id' => $user->id,
+                'sender_id' => $follower->id,
+                'type' => 'follow',
+                'reference_id' => null,
+            ]);
         }
 
         if (request()->wantsJson()) {

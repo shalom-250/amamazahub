@@ -4,13 +4,18 @@ import { Head, Link } from '@inertiajs/react';
 import { Bell, Heart, MessageSquare, UserPlus, AtSign, ChevronRight, Settings } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-export default function Notifications() {
-    const notifications = [
-        { id: 1, type: 'like', user: 'tiktok_star', content: 'liked your video.', time: '2h', avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=100' },
-        { id: 2, type: 'follow', user: 'creative_mind', content: 'started following you.', time: '5h', avatar: 'https://images.pexels.com/photos/1671325/pexels-photo-1671325.jpeg?auto=compress&cs=tinysrgb&w=100' },
-        { id: 3, type: 'comment', user: 'v_king', content: 'commented: "This is fire! 🔥"', time: '1d', avatar: 'https://images.pexels.com/photos/3408744/pexels-photo-3408744.jpeg?auto=compress&cs=tinysrgb&w=100' },
-        { id: 4, type: 'mention', user: 'trend_setter', content: 'mentioned you in a comment.', time: '2d', avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100' },
-    ];
+export default function Notifications({ notifications }) {
+    const list = notifications?.data || [];
+
+    const getContent = (type) => {
+        switch (type) {
+            case 'like': return 'liked your video.';
+            case 'comment': return 'commented on your video.';
+            case 'follow': return 'started following you.';
+            case 'mention': return 'mentioned you in a comment.';
+            default: return 'interacted with you.';
+        }
+    };
 
     const getIcon = (type) => {
         switch (type) {
@@ -46,7 +51,9 @@ export default function Notifications() {
 
                     {/* Notification List */}
                     <div className="bg-gray-900/20 rounded-3xl overflow-hidden border border-gray-900/50">
-                        {notifications.map((notif) => (
+                        {list.length === 0 ? (
+                            <div className="p-10 text-center text-gray-500 font-bold">No notifications yet.</div>
+                        ) : list.map((notif) => (
                             <motion.div
                                 key={notif.id}
                                 whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.03)' }}
@@ -54,8 +61,11 @@ export default function Notifications() {
                             >
                                 <div className="flex items-center space-x-4">
                                     <div className="relative">
-                                        <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-800">
-                                            <img src={notif.avatar} className="w-full h-full object-cover" alt={notif.user} />
+                                        <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-800 bg-gray-800 flex items-center justify-center font-bold text-xl">
+                                            {notif.sender?.avatar
+                                                ? <img src={notif.sender.avatar} className="w-full h-full object-cover" alt={notif.sender.username} />
+                                                : <span>{notif.sender?.name ? notif.sender.name[0].toUpperCase() : 'U'}</span>
+                                            }
                                         </div>
                                         <div className="absolute -bottom-1 -right-1 bg-black rounded-full p-1 border border-gray-900">
                                             {getIcon(notif.type)}
@@ -63,10 +73,12 @@ export default function Notifications() {
                                     </div>
                                     <div className="min-w-0">
                                         <p className="text-sm font-medium">
-                                            <span className="font-black italic mr-1">@{notif.user}</span>
-                                            <span className="text-gray-300">{notif.content}</span>
+                                            <span className="font-black italic mr-1">@{notif.sender?.username}</span>
+                                            <span className="text-gray-300">{getContent(notif.type)}</span>
                                         </p>
-                                        <p className="text-[10px] text-gray-500 font-bold uppercase mt-0.5">{notif.time}</p>
+                                        <p className="text-[10px] text-gray-500 font-bold uppercase mt-0.5">
+                                            {new Date(notif.created_at).toLocaleDateString()}
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="flex items-center">

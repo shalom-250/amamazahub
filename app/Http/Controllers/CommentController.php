@@ -21,6 +21,15 @@ class CommentController extends Controller
             'comment_text' => $request->comment_text,
         ]);
 
+        if ($video->user_id !== Auth::id()) {
+            \App\Models\Notification::create([
+                'user_id' => $video->user_id,
+                'sender_id' => Auth::id(),
+                'type' => 'comment',
+                'reference_id' => $comment->id,
+            ]);
+        }
+
         $video->increment('comments_count');
 
         return response()->json([
