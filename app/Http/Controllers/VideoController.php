@@ -37,7 +37,24 @@ class VideoController extends Controller
             $query->whereIn('user_id', $followingIds);
         }
 
-        $videos = $query->latest()->paginate(10);
+        if ($type === 'foryou') {
+            $user = Auth::user();
+            if ($user) {
+                $followingIds = $user->following()->pluck('following_id')->toArray();
+                $location = $user->location;
+                
+                $query->join('users', 'videos.user_id', '=', 'users.id')
+                    ->select('videos.*')
+                    ->addSelect(\DB::raw("
+                        (CASE WHEN users.id IN (" . (count($followingIds) ? implode(',', $followingIds) : '0') . ") THEN 2 ELSE 0 END +
+                         CASE WHEN users.location = " . \DB::getPdo()->quote($location) . " THEN 1 ELSE 0 END) as score
+                    "))
+                    ->orderByDesc('score');
+            }
+            $query->inRandomOrder();
+        }
+
+        $videos = $query->paginate(10);
 
         return Inertia::render('Welcome', [
             'videos' => $videos,

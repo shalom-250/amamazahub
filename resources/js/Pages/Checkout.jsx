@@ -5,6 +5,9 @@ import { ShieldCheck, Truck, CreditCard, ChevronLeft, Lock, Info } from 'lucide-
 import { motion } from 'framer-motion';
 
 export default function Checkout({ defaultAddress, defaultPayment, cartItems = [], subtotal = 0, user }) {
+    const parseFRW = (val) => parseFloat(String(val).replace(/[^0-9.]/g, '')) || 0;
+    const totalFRW = Math.round(parseFRW(subtotal)).toLocaleString();
+
     return (
         <AppLayout>
             <Head title="Checkout - AmazamaShop" />
@@ -108,15 +111,15 @@ export default function Checkout({ defaultAddress, defaultPayment, cartItems = [
                             <div className="space-y-4">
                                 <div className="flex justify-between">
                                     <span className="text-[10px] font-black italic uppercase text-gray-500">Subtotal</span>
-                                    <span className="font-bold italic">${subtotal.toFixed(2)}</span>
+                                    <span className="font-bold italic">{totalFRW} FRW</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-[10px] font-black italic uppercase text-gray-500">Shipping</span>
-                                    <span className="text-green-400 font-bold italic">$0.00</span>
+                                    <span className="text-green-400 font-bold italic">0 FRW</span>
                                 </div>
                                 <div className="flex justify-between border-t border-gray-800 pt-4">
                                     <span className="text-sm font-black italic uppercase tracking-[0.2em]">Total</span>
-                                    <span className="text-2xl font-black italic text-primary">${subtotal.toFixed(2)}</span>
+                                    <span className="text-2xl font-black italic text-primary">{totalFRW} FRW</span>
                                 </div>
                             </div>
 

@@ -5,7 +5,11 @@ import { ShoppingCart, Trash2, Plus, Minus, ChevronRight, ShieldCheck, Truck } f
 import { motion } from 'framer-motion';
 
 export default function Cart({ cartItems = [] }) {
-    const subtotal = cartItems.reduce((acc, item) => acc + (parseFloat(item.product.price) * item.quantity), 0);
+    // Strip leading '$' or non-numeric chars before parsing — prices stored as '$45.00'
+    const parseFRW = (val) => parseFloat(String(val).replace(/[^0-9.]/g, '')) || 0;
+    const formatFRW = (val) => `${Math.round(parseFRW(val)).toLocaleString()} FRW`;
+
+    const subtotal = cartItems.reduce((acc, item) => acc + (parseFRW(item.product.price) * item.quantity), 0);
 
     const updateQty = (id, newQty) => {
         if (newQty < 1 || newQty > 99) return;
@@ -46,7 +50,7 @@ export default function Cart({ cartItems = [] }) {
                                         <p className="text-xs text-gray-500 font-bold uppercase mb-4 tracking-widest">{item.color || 'Standard Edition'}</p>
 
                                         <div className="flex items-center justify-between">
-                                            <span className="text-lg font-black italic">${parseFloat(item.product.price).toFixed(2)}</span>
+                                            <span className="text-lg font-black italic">{formatFRW(item.product.price)}</span>
                                             <div className="flex items-center space-x-4 bg-black/40 border border-gray-800 rounded-xl px-2 py-1">
                                                 <button onClick={() => updateQty(item.id, item.quantity - 1)} className="p-1 hover:text-primary transition"><Minus size={14} /></button>
                                                 <span className="text-xs font-black italic w-4 text-center">{item.quantity}</span>
@@ -66,7 +70,7 @@ export default function Cart({ cartItems = [] }) {
                             <div className="space-y-4 border-b border-gray-800 pb-6">
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-500 font-bold uppercase tracking-wider text-[10px]">Subtotal</span>
-                                    <span className="font-black italic">${subtotal.toFixed(2)}</span>
+                                    <span className="font-black italic">{Math.round(subtotal).toLocaleString()} FRW</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-500 font-bold uppercase tracking-wider text-[10px]">Shipping</span>
@@ -75,7 +79,7 @@ export default function Cart({ cartItems = [] }) {
                             </div>
                             <div className="flex justify-between items-center text-xl">
                                 <span className="font-black italic text-sm tracking-widest uppercase">Total</span>
-                                <span className="font-black italic text-primary">${subtotal.toFixed(2)}</span>
+                                <span className="font-black italic text-primary">{Math.round(subtotal).toLocaleString()} FRW</span>
                             </div>
                             <Link disabled={cartItems.length === 0} href={cartItems.length === 0 ? '#' : '/shop/checkout'} className={`w-full bg-primary text-black font-black italic py-4 rounded-2xl flex items-center justify-center hover:scale-105 transition transform active:scale-95 shadow-xl shadow-primary/20 ${cartItems.length === 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}>
                                 Checkout

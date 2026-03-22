@@ -12,6 +12,7 @@ export default function Settings() {
         language: user.language || 'en',
         dark_mode: user.dark_mode ?? true,
         push_notifications: user.push_notifications ?? true,
+        location: user.location || 'Kigali',
     });
 
     const updateSetting = (key, value) => {
@@ -23,6 +24,8 @@ export default function Settings() {
         });
     };
 
+    const cities = ['Kigali', 'Musanze', 'Butare', 'Gisenyi', 'Kibuye', 'Gitarama'];
+
     const sections = [
         {
             title: 'Account',
@@ -33,6 +36,16 @@ export default function Settings() {
                     label: 'Language',
                     detail: data.language === 'en' ? 'English' : 'Kinyarwanda',
                     onClick: () => updateSetting('language', data.language === 'en' ? 'rw' : 'en')
+                },
+                {
+                    icon: <Globe size={20} />,
+                    label: 'Location',
+                    detail: data.location,
+                    onClick: () => {
+                        const currentIndex = cities.indexOf(data.location);
+                        const nextIndex = (currentIndex + 1) % cities.length;
+                        updateSetting('location', cities[nextIndex]);
+                    }
                 },
                 { icon: <Wallet size={20} />, label: 'Balance', detail: `${user.balance || 0} Coins`, href: '/wallet' },
             ]

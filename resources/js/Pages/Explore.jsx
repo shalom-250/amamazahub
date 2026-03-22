@@ -67,11 +67,26 @@ export default function Explore({ videos, currentCategory, categories }) {
                                 transition={{ delay: i * 0.05 }}
                                 className="aspect-[9/16] bg-gray-900 rounded-[32px] overflow-hidden relative group cursor-pointer transition transform hover:scale-[1.02] active:scale-95 shadow-lg border border-gray-800"
                             >
-                                <Link href={`/v/${video.id}`}>
-                                    <img
-                                        src={video.thumbnail_url}
+                                <Link href={`/v/${video.id}`} className="block w-full h-full">
+                                    <video
+                                        src={video.video_url}
+                                        loop
+                                        muted
+                                        playsInline
+                                        autoPlay={i === 0}
+                                        onMouseEnter={(e) => {
+                                            const playPromise = e.target.play();
+                                            if (playPromise !== undefined) {
+                                                playPromise.catch(() => {
+                                                    // Auto-play was prevented or interrupted
+                                                });
+                                            }
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.target.pause();
+                                            e.target.currentTime = 0;
+                                        }}
                                         className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-700 group-hover:scale-110"
-                                        alt={video.caption}
                                     />
                                     <Watermark size="sm" className="bottom-2 right-2 scale-75 transform origin-bottom-right" />
                                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/20 to-transparent p-4 pb-6 border-b-2 border-primary/0 group-hover:border-primary transition-all duration-300">

@@ -42,9 +42,11 @@ class HandleInertiaRequests extends Middleware
                     ->whereDoesntHave('followers', function ($query) use ($user) {
                         $query->where('follower_id', $user->id);
                     })
+                    ->orderByRaw("CASE WHEN location = ? THEN 0 ELSE 1 END", [$user->location])
+                    ->inRandomOrder()
                     ->limit(5)
                     ->get()
-                : \App\Models\User::limit(5)->get(),
+                : \App\Models\User::inRandomOrder()->limit(5)->get(),
         ];
     }
 }

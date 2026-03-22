@@ -15,6 +15,7 @@ class SettingsController extends Controller
             'language' => 'nullable|string|max:10',
             'dark_mode' => 'nullable|boolean',
             'push_notifications' => 'nullable|boolean',
+            'location' => 'nullable|string|max:50',
         ]);
 
         if ($request->has('language')) {
@@ -27,6 +28,10 @@ class SettingsController extends Controller
 
         if ($request->has('push_notifications')) {
             $user->push_notifications = $request->push_notifications;
+        }
+
+        if ($request->has('location')) {
+            $user->location = $request->location;
         }
 
         $user->save();

@@ -8,6 +8,8 @@ export default function ProductDetail({ product }) {
     if (!product) return null;
 
     const [selectedColor, setSelectedColor] = useState(product.colors?.[0] || null);
+    const parseFRW = (val) => parseFloat(String(val).replace(/[^0-9.]/g, '')) || 0;
+    const formatFRW = (val) => `${Math.round(parseFRW(val)).toLocaleString()} FRW`;
 
     const addToCart = () => {
         router.post('/shop/cart', {
@@ -62,9 +64,9 @@ export default function ProductDetail({ product }) {
                         </div>
 
                         <div className="text-3xl font-black italic tracking-tighter text-white">
-                            {product.price}
+                            {formatFRW(product.price)}
                             {product.original_price && (
-                                <span className="text-lg text-gray-500 line-through ml-3">{product.original_price}</span>
+                                <span className="text-lg text-gray-500 line-through ml-3">{formatFRW(product.original_price)}</span>
                             )}
                         </div>
 

@@ -5,7 +5,9 @@ import { ShoppingBag, Search, ShoppingCart, Tag, Truck, Star, ChevronRight, Filt
 import { motion } from 'framer-motion';
 
 export default function Shop({ products, categories = [] }) {
-    // We get dynamic categories from DB
+    const productList = products?.data ?? products ?? [];
+    const parseFRW = (val) => parseFloat(String(val).replace(/[^0-9.]/g, '')) || 0;
+    const formatFRW = (val) => `${Math.round(parseFRW(val)).toLocaleString()} FRW`;
 
     return (
         <AppLayout>
@@ -60,7 +62,7 @@ export default function Shop({ products, categories = [] }) {
 
                 {/* Product Grid */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                    {products.map((prod) => (
+                    {productList.map((prod) => (
                         <motion.div
                             key={prod.id}
                             whileHover={{ y: -8 }}
@@ -74,7 +76,7 @@ export default function Shop({ products, categories = [] }) {
                                 <div className="p-4 space-y-2">
                                     <p className="text-sm font-bold truncate group-hover:text-primary transition">{prod.name}</p>
                                     <div className="flex items-center justify-between">
-                                        <span className="text-lg font-black italic">{prod.price}</span>
+                                        <span className="text-lg font-black italic">{formatFRW(prod.price)}</span>
                                         <span className="text-[10px] text-gray-500 font-bold italic">{prod.sales} sold</span>
                                     </div>
                                     <div className="flex items-center space-x-1 text-yellow-400">

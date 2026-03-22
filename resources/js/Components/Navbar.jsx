@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import logo from '../images/logo.png';
 import { Search, Plus, MessageSquare, Bell, User, LogIn, LogOut, Settings, LayoutDashboard, Wallet, Radio, HelpCircle } from 'lucide-react';
 import { Link, usePage } from '@inertiajs/react';
 
@@ -11,7 +12,7 @@ export default function Navbar({ user }) {
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-2 group">
                 <div className="w-10 h-10 rounded-lg overflow-hidden shadow-lg shadow-primary/20 group-hover:scale-110 transition duration-300">
-                    <img src="/images/logo.png" className="w-full h-full object-cover" alt="AmazamaHub Logo" />
+                    <img src={logo} className="w-full h-full object-cover" alt="AmazamaHub Logo" />
                 </div>
                 <h1 className="text-2xl font-black italic tracking-tighter hover:text-primary transition duration-300 uppercase">AmazamaHub</h1>
             </Link>

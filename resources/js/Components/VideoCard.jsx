@@ -5,9 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Watermark from './Watermark';
 import axios from 'axios';
 
-export default function VideoCard({ video }) {
+export default function VideoCard({ video, isFirst = false }) {
     const videoRef = useRef(null);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [isMuted, setIsMuted] = useState(true); // Start muted for browser autoplay policy
     const [isLiked, setIsLiked] = useState(video.likes_exists || false);
     const [likesCount, setLikesCount] = useState(video.likes_count || 0);
     const [isFollowed, setIsFollowed] = useState(video.user.is_followed || false);
@@ -128,6 +129,9 @@ export default function VideoCard({ video }) {
         setLastTap(now);
 
         if (videoRef.current.paused) {
+            // User intentionally tapping play — unmute
+            videoRef.current.muted = false;
+            setIsMuted(false);
             videoRef.current.play();
             setIsPlaying(true);
         } else {
@@ -160,14 +164,41 @@ export default function VideoCard({ video }) {
         }
     };
 
+    // For the first video: auto-unmute on ANY first user gesture (scroll, move, touch, key)
+    useEffect(() => {
+        if (!isFirst) return;
+        const unmute = () => {
+            if (videoRef.current) {
+                videoRef.current.muted = false;
+                setIsMuted(false);
+            }
+            // Remove all listeners after first interaction
+            ['scroll', 'mousemove', 'touchstart', 'touchend', 'keydown', 'click'].forEach(evt =>
+                document.removeEventListener(evt, unmute)
+            );
+        };
+        ['scroll', 'mousemove', 'touchstart', 'touchend', 'keydown', 'click'].forEach(evt =>
+            document.addEventListener(evt, unmute, { once: true, passive: true })
+        );
+        return () => {
+            ['scroll', 'mousemove', 'touchstart', 'touchend', 'keydown', 'click'].forEach(evt =>
+                document.removeEventListener(evt, unmute)
+            );
+        };
+    }, [isFirst]);
+
     // Simple Intersection Observer to autoplay/pause video on scroll
     useEffect(() => {
         const options = { threshold: 0.6 };
         const observer = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
                 if (entry.isIntersecting) {
-                    videoRef.current?.play().catch(() => { });
-                    setIsPlaying(true);
+                    if (videoRef.current) {
+                        videoRef.current.muted = true; // Keep muted for scroll autoplay
+                        setIsMuted(true);
+                        videoRef.current.play().catch(() => { });
+                        setIsPlaying(true);
+                    }
                 } else {
                     videoRef.current?.pause();
                     setIsPlaying(false);
@@ -188,10 +219,19 @@ export default function VideoCard({ video }) {
                     onClick={togglePlay}
                     onTimeUpdate={handleTimeUpdate}
                     loop
+                    muted
                     playsInline
+                    autoPlay={isFirst}
                     className="w-full h-full object-cover cursor-pointer"
                     src={video.video_url}
                 />
+                {/* Muted indicator — tap to unmute */}
+                {isMuted && isPlaying && (
+                    <div className="absolute top-4 left-4 z-10 flex items-center space-x-1 bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-full text-[10px] font-black text-white/80 pointer-events-none">
+                        <span>🔇</span>
+                        <span>Tap to unmute</span>
+                    </div>
+                )}
 
                 {/* Brand Watermark */}
                 <Watermark size="lg" className="bottom-20 right-4" />

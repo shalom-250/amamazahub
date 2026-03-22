@@ -33,14 +33,30 @@ class LiveController extends Controller
         $request->validate([
             'title' => 'required|string|max:100',
             'description' => 'nullable|string|max:255',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
         ]);
+
+        $thumbnailUrl = url('/images/logo.png'); // Default brand fallback
+
+        if ($request->hasFile('thumbnail')) {
+            $file = $request->file('thumbnail');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            
+            // Ensure directory exists
+            if (!file_exists(public_path('uploads/live_thumbnails'))) {
+                @mkdir(public_path('uploads/live_thumbnails'), 0777, true);
+            }
+
+            $file->move(public_path('uploads/live_thumbnails'), $filename);
+            $thumbnailUrl = url('/uploads/live_thumbnails/' . $filename);
+        }
 
         $session = LiveSession::create([
             'user_id' => Auth::id(),
             'title' => $request->title,
             'description' => $request->description,
             'status' => 'live',
-            'thumbnail_url' => 'https://images.pexels.com/photos/257904/pexels-photo-257904.jpeg?auto=compress&cs=tinysrgb&w=800', // Default placeholder
+            'thumbnail_url' => $thumbnailUrl,
         ]);
 
         return redirect()->route('live.show', $session->id);

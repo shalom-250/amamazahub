@@ -19,16 +19,16 @@ class RwandanUserSeeder extends Seeder
     public function run(): void
     {
         $rwandanUsers = [
-            ['name' => 'Keza Alice', 'username' => 'keza_alice', 'email' => 'keza@example.com'],
-            ['name' => 'Mugisha Jean', 'username' => 'mugisha_j', 'email' => 'mugisha@example.com'],
-            ['name' => 'Gisa Eric', 'username' => 'gisa_eric', 'email' => 'gisa@example.com'],
-            ['name' => 'Ineza Marie', 'username' => 'ineza_m', 'email' => 'ineza@example.com'],
-            ['name' => 'Manzi Bruno', 'username' => 'manzi_b', 'email' => 'manzi@example.com'],
-            ['name' => 'Uwase Ange', 'username' => 'uwase_ange', 'email' => 'uwase@example.com'],
-            ['name' => 'Shema Kevin', 'username' => 'shema_k', 'email' => 'shema@example.com'],
-            ['name' => 'Mutoni Bella', 'username' => 'mutoni_b', 'email' => 'mutoni@example.com'],
-            ['name' => 'Habimana Paul', 'username' => 'habimana_p', 'email' => 'habimana@example.com'],
-            ['name' => 'Iradukunda Faith', 'username' => 'iradukunda_f', 'email' => 'iradukunda@example.com'],
+            ['name' => 'Comedy King', 'username' => 'funny_king', 'email' => 'funny@example.com', 'location' => 'Kigali'],
+            ['name' => 'Edu Tech', 'username' => 'edutech_pro', 'email' => 'edu@example.com', 'location' => 'Kigali'],
+            ['name' => 'Gamer Girl', 'username' => 'gg_gamer', 'email' => 'gamer@example.com', 'location' => 'Musanze'],
+            ['name' => 'Music Vibes', 'username' => 'music_vibes', 'email' => 'music@example.com', 'location' => 'Butare'],
+            ['name' => 'Vlog Life', 'username' => 'vlog_life', 'email' => 'vlog@example.com', 'location' => 'Gisenyi'],
+            ['name' => 'Uwase Ange', 'username' => 'uwase_ange', 'email' => 'uwase@example.com', 'location' => 'Kigali'],
+            ['name' => 'Shema Kevin', 'username' => 'shema_k', 'email' => 'shema@example.com', 'location' => 'Kigali'],
+            ['name' => 'Mutoni Bella', 'username' => 'mutoni_b', 'email' => 'mutoni@example.com', 'location' => 'Musanze'],
+            ['name' => 'Habimana Paul', 'username' => 'habimana_p', 'email' => 'habimana@example.com', 'location' => 'Kibuye'],
+            ['name' => 'Iradukunda Faith', 'username' => 'iradukunda_f', 'email' => 'iradukunda@example.com', 'location' => 'Butare'],
         ];
 
         $users = [];
@@ -46,8 +46,8 @@ class RwandanUserSeeder extends Seeder
         foreach ($users as $user) {
             $categories = ['Trending', 'Comedy', 'Education', 'Gaming', 'Music', 'Vlogs'];
             $videos = [
-                ['url' => 'https://vjs.zencdn.net/v/oceans.mp4', 'thumb' => url('/images/logo.png')],
-                ['url' => 'https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_1mb.mp4', 'thumb' => url('/images/logo.png')],
+                ['url' => 'https://www.w3schools.com/html/mov_bbb.mp4', 'thumb' => url('/images/logo.png')],
+                ['url' => 'https://www.w3schools.com/html/mov_bbb.mp4', 'thumb' => url('/images/logo.png')],
                 ['url' => 'https://www.w3schools.com/html/mov_bbb.mp4', 'thumb' => url('/images/logo.png')],
             ];
 

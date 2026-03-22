@@ -13,8 +13,8 @@ export default function VideoFeed({ videos }) {
 
     return (
         <div className="w-full">
-            {videos.map((video) => (
-                <VideoCard key={video.id} video={video} />
+            {videos.map((video, index) => (
+                <VideoCard key={video.id} video={video} isFirst={index === 0} />
             ))}
         </div>
     );

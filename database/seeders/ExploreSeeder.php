@@ -19,11 +19,11 @@ class ExploreSeeder extends Seeder
     public function run(): void
     {
         $exploreUsers = [
-            ['name' => 'Comedy King', 'username' => 'funny_king', 'email' => 'funny@example.com'],
-            ['name' => 'Edu Tech', 'username' => 'edutech_pro', 'email' => 'edu@example.com'],
-            ['name' => 'Gamer Girl', 'username' => 'gg_gamer', 'email' => 'gamer@example.com'],
-            ['name' => 'Music Vibes', 'username' => 'music_vibes', 'email' => 'music@example.com'],
-            ['name' => 'Vlog Life', 'username' => 'vlog_life', 'email' => 'vlog@example.com'],
+            ['name' => 'Comedy King', 'username' => 'funny_king', 'email' => 'funny@example.com', 'location' => 'Kigali'],
+            ['name' => 'Edu Tech', 'username' => 'edutech_pro', 'email' => 'edu@example.com', 'location' => 'Kigali'],
+            ['name' => 'Gamer Girl', 'username' => 'gg_gamer', 'email' => 'gamer@example.com', 'location' => 'Musanze'],
+            ['name' => 'Music Vibes', 'username' => 'music_vibes', 'email' => 'music@example.com', 'location' => 'Butare'],
+            ['name' => 'Vlog Life', 'username' => 'vlog_life', 'email' => 'vlog@example.com', 'location' => 'Gisenyi'],
         ];
 
         $users = [];

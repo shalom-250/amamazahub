@@ -1,6 +1,7 @@
 import React from 'react';
+import logo from '../images/logo.png';
 import AppLayout from '../Components/AppLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { Radio, Users, Heart, Share2, MessageCircle, Gift, X, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -41,7 +42,7 @@ export default function Live({ sessions }) {
                                 <Link href={`/live/${stream.id}`}>
                                     <div className="relative aspect-[4/5] overflow-hidden">
                                         <img
-                                            src={stream.thumbnail_url || '/images/logo.png'}
+                                            src={stream.thumbnail_url || logo}
                                             className="w-full h-full object-cover group-hover:scale-110 transition duration-700 opacity-60 group-hover:opacity-100"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>

@@ -28,6 +28,7 @@ class User extends Authenticatable
         'balance',
         'dark_mode',
         'push_notifications',
+        'location',
     ];
 
     /**
