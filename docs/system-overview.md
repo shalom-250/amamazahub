@@ -8,7 +8,7 @@
 | **Frontend** | React 18 + Inertia.js |
 | **Styling** | Tailwind CSS |
 | **Build Tool** | Vite |
-| **Database** | SQLite (dev) / MySQL (production) |
+| **Database** | SQLite (dev) / MySQL (production) | postgresql
 | **Auth** | Laravel Sanctum |
 | **Animations** | Framer Motion |
 
